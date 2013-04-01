@@ -1,4 +1,4 @@
-# Capture
+# Capture [![Build Status](https://travis-ci.org/eatarandom/capture.png?branch=master)](https://travis-ci.org/eatarandom/capture)
 
 
 > Analytics made easy. (Currently in development.)
