@@ -1,0 +1,17 @@
+{
+  "name": "capture",
+  "version": "0.0.1",
+  "description": "Analytics made easy.",
+  "scripts": {
+    "test": "mocha test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/eatarandom/capture.git"
+  },
+  "author": "Dan Roberts (@eatarandom)",
+  "license": "BSD",
+  "devDependencies": {
+    "mocha": "~1.8.1"
+  }
+}

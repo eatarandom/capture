@@ -24,9 +24,6 @@
     };
 
 
-
-    
-
     /*
     var Provider = function (options) {};
 
