@@ -1,7 +1,7 @@
 # Capture
 
 
-> Analytics made easy.
+> Analytics made easy. (Currently in development.)
 
 ## Usage
 
