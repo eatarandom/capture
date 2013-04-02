@@ -22,7 +22,7 @@ var config = [{
 	    opt_noninteraction: 'opt_noninteraction'
 	}
 }];
-var capture = Capture({							
+var capture = new Capture({							
 	debug: true,								// default: false
 	config: config								// (*required) an array of track objects
 });
