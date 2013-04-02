@@ -18,7 +18,7 @@ module.exports = function (grunt) {
 		},
 
 		jshint: {
-			all: ["Gruntfile.js", "src/capture.js"],
+			all: ["Gruntfile.js", "src/capture.js", "test/*.js"],
 			options: {
 				"node"     : true,
                 "es5"      : true,
