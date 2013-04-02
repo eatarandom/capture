@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Analytics made easy.",
   "scripts": {
-    "test": "mocha test/test.js"
+    "test": "grunt"
   },
   "repository": {
     "type": "git",
@@ -12,6 +12,10 @@
   "author": "Dan Roberts (@eatarandom)",
   "license": "BSD",
   "devDependencies": {
-    "mocha": "~1.8.1"
+    "grunt": "*",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-jshint": "~0.3.0",
+    "grunt-docco": "~0.2.0",
+    "matchdep": "~0.1.1"
   }
 }
