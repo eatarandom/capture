@@ -12,19 +12,20 @@ module.exports = function (grunt) {
 			debug: {
 				src: ['src/capture.js'],
 				options: {
-					output: 'docs/'
+					output: 'docs/',
+					extension: 'md'
 				}	
 			}
 		},
 
 		jshint: {
-			all: ["Gruntfile.js", "src/capture.js", "test/*.js"],
+			all: ["Gruntfile.js", "src/capture.js", "test/{,*/}*.js"],
 			options: {
 				"node"     : true,
                 "es5"      : true,
                 "browser"  : true,
                 "boss"     : false,
-                "curly"    : true,
+                "curly"    : false,
                 "debug"    : false,
                 "devel"    : false,
                 "eqeqeq"   : true,
@@ -37,7 +38,7 @@ module.exports = function (grunt) {
                 "noarg"    : true,
                 "noempty"  : false,
                 "nonew"    : false,
-                "onevar"   : true,
+                "onevar"   : false,
                 "plusplus" : false,
                 "regexp"   : false,
                 // switch to true once figuring out why
@@ -50,7 +51,7 @@ module.exports = function (grunt) {
 		},
 
 		nodeunit: {
-			all: ["test/*.js"]
+			all: ["test/{,*/}*.js"]
 		}
 
 	});
