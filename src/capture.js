@@ -188,13 +188,13 @@
 
         initialize: function () {
             var self = this;
-            this.selector = $(this.selector);
-            if (!this.selector || !this.selector.length) {
-                throw new Error('CaptureEvent' + this.id + 'needs a valid selector');
-            }
-            this.selector.on(this.action, function(event){
-                self.publish(event);
-            });
+            // this.selector = $(this.selector);
+            // // if (!this.selector || !this.selector.length) {
+            // //     throw new Error('CaptureEvent' + this.id + 'needs a valid selector');
+            // // }
+            // this.selector.on(this.action, function (event) {
+            //     self.publish(event);
+            // });
         },
 
         publish: function (event) {
