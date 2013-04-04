@@ -1,20 +1,19 @@
-/*
- *  capture.js
- *
- *  Description:
- *  Javascript tracking made easy.
- *  
- *  Current assumed dependencies:
- *  _ : Underscore (trying to remove?)
- *  $ : Zepto/Jquery (can we remove?)
- */
+// Capture.js 0.0.1
+//  
+//  (c) 2013 Dan Roberts, Ogilvy & Mather Atlanta
+//  Capture may be freely distributed under the MIT license.
+//  For all details and documentation:
+//  https://github.com/eatarandom/capture
+//  
 
 (function () {
     
     "use strict";
 
+    // Store a reference to `window` or `global` on the server.
     var root = this;
 
+    // Current capture version.
     var VERSION = '0.0.1';
 
     // Default properties.
@@ -25,7 +24,6 @@
         
     // CaptureEvent default properties. 
     var captureEventDefaults = {
-            id: -1,
             selector: 'body',
             action: 'click',
             type: 'track',
@@ -33,7 +31,7 @@
         };
 
     // Store CaptureEvents for internal use.
-    // CaptureEvents are stored for multiple instances of Capture.
+    // Note: CaptureEvents are stored for multiple instances of Capture.
     var captureEvents = [];
 
     // Store Providers for internal use.
@@ -83,10 +81,25 @@
     // Credit the authors of __Underscore.js__ 
     // Reference `_.keys(obj)` [Underscore.js](https://github.com/documentcloud/underscore)
     var keys = Object.keys || function (obj) {
-        if (obj !== Object(obj)) throw new TypeError('Invalid object');
+        if (obj !== Object(obj)) {
+            throw new TypeError('Invalid object');
+        }
         var keys = [];
-        for (var key in obj) if (_.has(obj, key)) keys[keys.length] = key;
+        for (var key in obj) {
+            if (has(obj, key)) {
+                keys[keys.length] = key;
+            }
+        }
         return keys;
+    };
+
+    // #### Has
+    // Does an object have a key.
+    
+    // Credit the authors of __Underscore.js__ 
+    // Reference `_.keys(obj)` [Underscore.js](https://github.com/documentcloud/underscore)
+    var has = function (obj, key) {
+        return Object.prototype.hasOwnProperty.call(obj, key);
     };
 
     // #### Results
@@ -96,76 +109,57 @@
     // Otherwise, keep the key/value the same.
     var results = function (obj, context) {
         var ctx = context || root; // leak of scope here, fix
-        _.each(keys(obj), function (key) {
+        
+        for (var i = 0, j = keys(obj).length; i < j; i++) {
             if (typeof obj[key] === 'function') {
                 obj[key] = obj[key].call(context);
-            }
-        });
+            }   
+        }
         return obj;
     };
-
-
-
 
 
     // ## Internal Methods
 
     // ### Events
-    // Events shared throughout Capture.
-    // TODO: Remove this stuff and apply mediator directly
-    var Events = {
-        evt: {
-            track: 'TRACK',
-            pageview: 'PAGEVIEW'
-        },
-        // 
-        trigger: function () {
-            var length = arguments.length++;
-            arguments[length] = this;
-            mediator.publish.apply(mediator, [].slice.call(arguments, 0).push(this));
-        },
-        on: function () {
-            var length = arguments.length++;
-            arguments[length] = this;
-            mediator.subscribe.apply(mediator, arguments);
+    // Events Mediator shared throughout Capture.
+    
+    var Events = (function () {
+
+        function Mediator() { 
+            this.subjects = {}; 
         }
-    };
-        
 
-    var mediator = new Mediator();
-
-    // ### Mediator
-    // 
-    function Mediator() {
-        this.subjects = {};
-    }
-
-    extend(Mediator.prototype, {
-        publish: function (name, options, context) {
-            console.log('publish', this.subjects);
-            if (this.subjects.hasOwnProperty(name)) {
-                for (var i = 0, j = this.subjects[name].length; i < j; i++) {
-                    var subject = this.subjects[name][i];
-                    subject.callback.call(context, arguments);
-                    console.log('calling', subject.callback, 'with', arguments);
-                }   
+        extend(Mediator.prototype, {
+            publish: function (name, options, context) {
+                if (this.subjects.hasOwnProperty(name)) {
+                    for (var i = 0, j = this.subjects[name].length; i < j; i++) {
+                        var subject = this.subjects[name][i];
+                        subject.callback.call(context, arguments);
+                    }   
+                }
+            },
+            subscribe: function (name, callback, context) {
+                name = name.toString();
+                if (!this.subjects.hasOwnProperty(name)) {
+                    this.subjects[name] = [];    
+                }
+                this.subjects[name].push({
+                    context: this,
+                    callback: callback
+                });
             }
-        },
-        subscribe: function (name, callback, context) {
-            name = name.toString();
-            if (!this.subjects.hasOwnProperty(name)) {
-                this.subjects[name] = [];    
-            }
-            this.subjects[name].push({
-                context: this,
-                callback: callback
-            });
-            console.log('subscribe', this.subjects);
-        }
-    });
+        });
 
+        return {
+            evt: {
+                track: 'track',
+                pageview: 'pageview'
+            },
+            mediator: new Mediator()
+        };
 
-
+    }).call(root);
 
 
     // ### CaptureEvent
@@ -184,7 +178,7 @@
         },
 
         triggerEvent: function () {
-            this.trigger(this.type, results(this.props, this), this);
+            this.mediator.publish(this.type, results(this.props, this), this);
         }
     
     }));
@@ -228,13 +222,12 @@
         this.initialize.call(this);
     }
 
-    // ## Extend Capture
     extend(Capture.prototype, extend(Events, {
 
         // __Initialize__
         initialize: function () {
-            this.on('track', this.track);
-            this.on('pageview', this.pageview);
+            this.mediator.subscribe('track', this.track);
+            this.mediator.subscribe('pageview', this.pageview);
             
             if (this.config && this.config.length) {
                 for (var i = 0, j = this.config.length; i < j; i++) {
@@ -242,7 +235,7 @@
                 }   
             }
         },
-        // __Add a CaptureEvent__
+        
         addCaptureEvent: function (capture_event) {
             var cEvents = captureEvents,
                 length = cEvents.length,
@@ -251,17 +244,27 @@
             log.call(this, 'Added a new CaptureEvent ', cEvent);
             return cEvent;
         },
-        // __Remove a CaptureEvent__
-        removeCaptureEvent: function (id) {},
-        // __Track__
+        
+        removeCaptureEvent: function (cid) {
+            for (var i = 0, l = captureEvents.length; i < l; i++) {
+                var ce = captureEvents[i];
+                if (ce.cid === cid) {
+                    return ce;
+                }
+            }
+            return false;
+        },
+        
+        // should just be a wrapper to call providers 
         track: function (options) {
             //this.trigger('track', options, this);
-            console.log('hey i\'m tracking', options);
+            //console.log('hey i\'m tracking', options);
         },
-        // __Pageview__
+        
+        // should just be a wrapper to call providers 
         pageview: function (options) {
             //this.trigger('pageview', options, this);
-            console.log('hey i\'m pageview', options);
+            //console.log('hey i\'m pageview', options);
         }
 
     }));
