@@ -8,9 +8,18 @@ module.exports = function (grunt) {
 
 		pkg: grunt.file.readJSON('package.json'),
 
+		config: {
+			name: '<%= pkg.name %>',
+			version: '<%= pkg.version %>',
+			year: '<%= new Date().getFullYear() %>',
+			author: '<%= pkg.author %>',
+			license: '<%= pkg.license %>',
+			homepage: '<%= pkg.homepage %>' 
+		},
+
 		docco: {
 			debug: {
-				src: ['src/capture.js'],
+				src: ['capture.js'],
 				options: {
 					output: 'docs/',
 					extension: 'md'
@@ -50,15 +59,60 @@ module.exports = function (grunt) {
 			}
 		},
 
+		replace: {
+			release: {
+				options: {
+					variables: {
+						'name': '<%= config.name %>',
+						'version': '<%= config.version %>',
+						'year': '<%= config.date %>',
+						'author': '<%= config.author %>',
+						'license': '<%= config.license %>',
+						'homepage': '<%= config.homepage %>' 
+					},
+					flatten: true
+				},
+				files: [{
+					src: ['src/capture.js'],
+					dest: 'capture.js'
+				}]
+			}
+		},
+
 		nodeunit: {
 			all: ["test/{,*/}*.js"]
+		},
+
+		uglify: {
+			release: {
+				options: {
+					'banner': '/*!\n' +
+						' * <%= config.name %> <%= config.version %>\n' +
+						' * (c) <%= config.year %> <%= config.author %>\n' +
+						' * Capture may be freely distributed under the <%= config.license %> license.\n' +
+						' * For all details and documentation:\n' +
+						' * <%= config.homepage %>\n' +
+						' */\n'
+				},
+				files: {
+					'capture.min.js': ['capture.js']
+				}
+			}	
 		}
 
 	});
 	
+	// Test task.
+	grunt.registerTask('test', ['jshint', 'nodeunit']);
+
 	// Default task.
-	grunt.registerTask('default', ['jshint', 'nodeunit']);
+	grunt.registerTask('default', 'test');
 
 	// Release task.
-	grunt.registerTask('release', 'docco');
+	grunt.registerTask('release', [
+		'test', 
+		'replace',
+		'uglify', 
+		'docco'
+	]);
 };

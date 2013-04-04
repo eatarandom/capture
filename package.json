@@ -1,21 +1,24 @@
 {
-  "name": "capture",
+  "name": "Capture",
   "version": "0.0.1",
-  "description": "Analytics made easy.",
+  "description": "Javascript analytics made easy.",
   "scripts": {
     "test": "grunt"
   },
+  "homepage": "http://eatarandom.github.com/capture/",
   "repository": {
     "type": "git",
     "url": "git://github.com/eatarandom/capture.git"
   },
-  "author": "Dan Roberts (@eatarandom)",
-  "license": "BSD",
+  "author": "Dan Roberts, Ogilvy & Mather Atlanta",
+  "license": "MIT",
   "devDependencies": {
     "grunt": "*",
     "grunt-contrib-nodeunit": "~0.1.2",
     "grunt-contrib-jshint": "~0.3.0",
     "grunt-docco": "~0.2.0",
-    "matchdep": "~0.1.1"
+    "matchdep": "~0.1.1",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-replace": "~0.4.2"
   }
 }

@@ -1,9 +1,9 @@
-// @@name @@version
+// Capture 0.0.1
 //  
-// (c) @@year @@author
-// @@name may be freely distributed under the @@license license.
+// (c)  Dan Roberts, Ogilvy & Mather Atlanta
+// Capture may be freely distributed under the MIT license.
 // For all details and documentation:
-// [@@homepage](@@homepage)
+// [http://eatarandom.github.com/capture/](http://eatarandom.github.com/capture/)
 // 
 
 (function () {
@@ -14,14 +14,14 @@
     var root = this;
 
     // Current capture version.
-    var VERSION = '@@version';
+    var VERSION = '0.0.1';
 
     // Default properties.
     var defaults = {
             debug: false,
             delay: false
         };
-    
+        
     // CaptureEvent default properties. 
     var captureEventDefaults = {
             selector: 'body',
@@ -30,18 +30,11 @@
             props: {}
         };
 
-    // 
-    var supportedActions = ['click', 'mouseover'];
-
-    //
-    var supportedTypes = ['track', 'pageview'];
-
     // Store CaptureEvents for internal use.
-    // TODO: captureEvents array should be Capture instance specific
+    // Note: CaptureEvents are stored for multiple instances of Capture.
     var captureEvents = [];
 
     // Store Providers for internal use.
-    // TODO: providers array should be Capture instance specific
     var providers = [];
 
     // ## Helper Methods
@@ -118,7 +111,6 @@
         var ctx = context || root; // leak of scope here, fix
         
         for (var i = 0, j = keys(obj).length; i < j; i++) {
-            var key = obj[i];
             if (typeof obj[key] === 'function') {
                 obj[key] = obj[key].call(context);
             }   
@@ -140,20 +132,19 @@
 
         extend(Mediator.prototype, {
             publish: function (name, options, context) {
-                var subjects = this.subjects;
-                if (subjects.hasOwnProperty(name)) {
-                    for (var i = 0, j = subjects[name].length; i < j; i++) {
-                        var subject = subjects[name][i];
+                if (this.subjects.hasOwnProperty(name)) {
+                    for (var i = 0, j = this.subjects[name].length; i < j; i++) {
+                        var subject = this.subjects[name][i];
                         subject.callback.call(context, arguments);
                     }   
                 }
             },
             subscribe: function (name, callback, context) {
-                var subjects = this.subjects;
-                if (!subjects.hasOwnProperty(name)) {
-                    subjects[name] = [];    
+                name = name.toString();
+                if (!this.subjects.hasOwnProperty(name)) {
+                    this.subjects[name] = [];    
                 }
-                subjects[name].push({
+                this.subjects[name].push({
                     context: this,
                     callback: callback
                 });
@@ -204,8 +195,8 @@
     extend(Provider.prototype, extend(Events, {
     
         initialize: function () {
-            this.mediator.subscribe(this.evt.track, this.track);
-            this.mediator.subscribea(this.evt.pageview, this.pageview);
+            this.on('track', this.track);
+            this.on('pageview', this.pageview);
         },
 
         track: function () {},
@@ -215,7 +206,10 @@
     })); 
 
 
-    // ## Capture   
+    // ## Capture 
+
+    // #### Contstuctor
+    
     function Capture(config, options) {
         this.version = VERSION;
 
@@ -230,9 +224,10 @@
 
     extend(Capture.prototype, extend(Events, {
 
+        // __Initialize__
         initialize: function () {
-            this.mediator.subscribe(this.evt.track, this.track);
-            this.mediator.subscribe(this.evt.track, this.pageview);
+            this.mediator.subscribe('track', this.track);
+            this.mediator.subscribe('pageview', this.pageview);
             
             if (this.config && this.config.length) {
                 for (var i = 0, j = this.config.length; i < j; i++) {
