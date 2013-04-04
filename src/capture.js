@@ -13,6 +13,9 @@
     // Store a reference to `window` or `global` on the server.
     var root = this;
 
+    // Reference to 
+    var $ = root.Zepto || root.jQuery || root.$;
+
     // Current capture version.
     var VERSION = '@@version';
 
@@ -139,12 +142,12 @@
         }
 
         extend(Mediator.prototype, {
-            publish: function (name, options, context) {
+            publish: function (name, props, context) {
                 var subjects = this.subjects;
                 if (subjects.hasOwnProperty(name)) {
                     for (var i = 0, j = subjects[name].length; i < j; i++) {
                         var subject = subjects[name][i];
-                        subject.callback.call(context, arguments);
+                        subject.callback.call(context, props);
                     }   
                 }
             },
@@ -172,7 +175,8 @@
 
 
     // ### CaptureEvent
-    // Class for CaptureEvents.
+    // Class for CaptureEvents. Assumed now to be events based on dom interaction. See todos.
+    // TODO: distinguish events bewteen dom based or javascript based?
     function CaptureEvent(options) {
         this.cid = uniqueId('ce');
         extend(this, extend(captureEventDefaults, options)); 
@@ -183,11 +187,20 @@
     extend(CaptureEvent.prototype, extend(Events, {
 
         initialize: function () {
-            this.triggerEvent();
+            var self = this;
+            this.selector = $(this.selector);
+            if (!this.selector || !this.selector.length) {
+                throw new Error('CaptureEvent' + this.id + 'needs a valid selector');
+            }
+            this.selector.on(this.action, function(event){
+                self.publish(event);
+            });
         },
 
-        triggerEvent: function () {
+        publish: function (event) {
             this.mediator.publish(this.type, results(this.props, this), this);
+            
+            event.preventDefault();
         }
     
     }));
@@ -241,6 +254,8 @@
             }
         },
         
+        // TODO: distinguish bewten dom based event and javascript based event?
+        // TODO: error check this so a new event isn't created unless it valid
         addCaptureEvent: function (capture_event) {
             var cEvents = captureEvents,
                 length = cEvents.length,
@@ -261,13 +276,13 @@
         },
         
         // should just be a wrapper to call providers 
-        track: function (options) {
+        track: function (props) {
             //this.trigger('track', options, this);
-            //console.log('hey i\'m tracking', options);
+            console.log('tracking', props);
         },
         
         // should just be a wrapper to call providers 
-        pageview: function (options) {
+        pageview: function (props) {
             //this.trigger('pageview', options, this);
             //console.log('hey i\'m pageview', options);
         }

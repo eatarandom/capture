@@ -27,7 +27,7 @@
 
  		
 
- 		/*
+ 		
  		var captureConfig = 
 		[{
 			'id': '100',
@@ -44,49 +44,47 @@
 			    opt_value: 'opt_value',
 			    opt_noninteraction: 'opt_noninteraction'
 			}
-		}, {
-			'id': '101',
-			'delay': true,
-			'selector': '.test-link.b',
-			'action': 'click',
-			'type': 'pageview',
-			'props': {
-		    	category: 'category',
-		    	action: 'action',
-			    opt_label: 'opt_label',
-			    opt_value: 1,
-			    opt_noninteraction: true
-			}
-		}, {
-			'id': '209',
-			'delay': true,
-			'selector': '.test-link.c',
-			'action': 'mouseover',
-			'type': 'track',
-			'props': {
-		    	category: 'category',
-		    	action: 'action',
-			    opt_label: 'opt_label',
-			    opt_value: 0,
-			    opt_noninteraction: false
-			}
+		// }, {
+		// 	'id': '101',
+		// 	'delay': true,
+		// 	'selector': '.test-link.b',
+		// 	'action': 'click',
+		// 	'type': 'pageview',
+		// 	'props': {
+		//     	category: 'category',
+		//     	action: 'action',
+		// 	    opt_label: 'opt_label',
+		// 	    opt_value: 1,
+		// 	    opt_noninteraction: true
+		// 	}
+		// }, {
+		// 	'id': '209',
+		// 	'delay': true,
+		// 	'selector': '.test-link.c',
+		// 	'action': 'mouseover',
+		// 	'type': 'track',
+		// 	'props': {
+		//     	category: 'category',
+		//     	action: 'action',
+		// 	    opt_label: 'opt_label',
+		// 	    opt_value: 0,
+		// 	    opt_noninteraction: false
+		// 	}
 		}];
 
 
- 		var capture = new Capture({
+ 		var capture = new Capture(captureConfig, {
  			// debug mode ?
  			debug: true,
  			// delay
  			delay: true,
- 			//
- 			config: captureConfig
  			//providers
  			// provider: {
  			// 	name: 'GoogleAnalytics',
 
  			// }
  		});
-		*/
+		
  		//var c = new CaptureEvent(captureConfig[0]);
 
  	</script>
