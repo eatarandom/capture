@@ -10,20 +10,21 @@
  	<meta name='description' content=''>
  	<meta name='viewport' content='width=device-width'>
  	<style>
- 		a {
- 			display:block;
- 		}
+
 	</style>
 </head>
 <body>
  	<h1> 
- 		Capture 
+ 		Capture
  	</h1>
-	<a class="test-link a" href="/test-link-a">Hover to trigger a track event</a>
-	<a class="test-link b" href="/test-link-b">Click to trigger a pageview</a>
-	<a class="test-link c" href="/test-link-c">Click to trigger a track event &amp; a pageview</a>
-	<a class="test-link d" href="/test-link-d">Click to trigger a track event from javascript</a>
-
+ 	<ul>
+ 		<li><a class="test-link a" href="/test-link-a">Hover to trigger a track event</a></li>
+ 		<li><a class="test-link b" href="/test-link-b">Click to trigger a pageview</a></li>
+ 		<li><a class="test-link c" href="/test-link-c">Click to trigger a track event &amp; a pageview</a></li>
+ 		<li><a class="test-link d" href="/test-link-d">Click to trigger a track event from javascript</a></li>
+ 	</ul>
+	
+	
  	<script src="components/underscore/underscore-min.js"></script>
  	<script src="components/zepto/zepto.min.js"></script> 	
  	<script src="src/capture.js"></script>
@@ -34,9 +35,6 @@
 
  	<script>
 
- 		
-
- 		
  		var captureConfig = 
 		[{
 			'id': '10',
@@ -109,7 +107,6 @@
  			// }
  		});
 		
- 		//var c = new CaptureEvent(captureConfig[0]);
 
  		$('.test-link').on('click', '.d', function(e) {
 
@@ -130,3 +127,4 @@
 
 
 
+ 

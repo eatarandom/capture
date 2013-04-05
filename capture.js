@@ -33,10 +33,10 @@
             props: {}
         };
 
-    // 
+    // Maybe do something with this?
     var supportedActions = ['click', 'mouseover'];
 
-    //
+    // Maybe do something with this?
     var supportedTypes = ['track', 'pageview'];
 
     // Store CaptureEvents for internal use.
@@ -47,7 +47,7 @@
     // TODO: providers array should be Capture instance specific
     var providers = [];
 
-    // ## Helper Methods
+    // ## Internal Helper Methods
 
     // #### Log
     // A safe way to console log.

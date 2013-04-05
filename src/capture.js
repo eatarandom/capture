@@ -33,10 +33,10 @@
             props: {}
         };
 
-    // 
+    // Maybe do something with this?
     var supportedActions = ['click', 'mouseover'];
 
-    //
+    // Maybe do something with this?
     var supportedTypes = ['track', 'pageview'];
 
     // Store CaptureEvents for internal use.
@@ -47,7 +47,7 @@
     // TODO: providers array should be Capture instance specific
     var providers = [];
 
-    // ## Helper Methods
+    // ## Internal Helper Methods
 
     // #### Log
     // A safe way to console log.
@@ -241,7 +241,8 @@
     // ## Capture   
     function Capture(config, options) {
         this.version = VERSION;
-
+        this.events = [];
+        this.providers = [];
         if (!config || typeof config === 'object' && !config.length) {
             options = config;
         } else {
@@ -266,18 +267,19 @@
         
         // TODO: distinguish bewten dom based event and javascript based event?
         // TODO: error check this so a new event isn't created unless it valid
-        addCaptureEvent: function (capture_event) {
-            var cEvents = captureEvents,
-                length = cEvents.length,
+        addEvent: function (capture_event) {
+            var events = this.events,
+                length = events.length,
                 cEvent = new CaptureEvent(capture_event); 
-            cEvents[length] = cEvent;
+            events[length] = events;
             //log.call(this, 'Added a new CaptureEvent ', cEvent);
             return cEvent;
         },
         
-        removeCaptureEvent: function (cid) {
-            for (var i = 0, l = captureEvents.length; i < l; i++) {
-                var ce = captureEvents[i];
+        // TODO: make sure to remove events when removing
+        removeEvent: function (cid) {
+            for (var i = 0, l = this.events.length; i < l; i++) {
+                var ce = events[i];
                 if (ce.cid === cid) {
                     return ce;
                 }
@@ -287,13 +289,11 @@
         
         // should just be a wrapper to call providers 
         track: function (props) {
-            //this.trigger('track', options, this);
             console.log('tracking', props);
         },
         
         // should just be a wrapper to call providers 
         pageview: function (props) {
-            //this.trigger('pageview', options, this);
             console.log('pageview', props);
         }
 
