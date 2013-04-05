@@ -16,7 +16,7 @@
     <div class="wrapper">
       <header>
         <h1>Capture</h1>
-        <p>Analytics made easy</p>
+        <p>Javascript analytics made easy.</p>
 
         <p class="view"><a href="https://github.com/eatarandom/capture">View the Project on GitHub <small>eatarandom/capture</small></a></p>
 
@@ -35,16 +35,91 @@
 <p>Javascript analytics made easy. (Currently in development.)</p>
 </blockquote>
 
-<h2>Set up locally</h2>
+<h2>Getting Started</h2>
 
-<div class="highlight"><pre>  git clone git@github.com:eatarandom/capture.git
-  <span class="nb">cd </span>capture
-  npm install and bower install
+<div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">capture</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Capture</span><span class="p">({</span>
+        <span class="c1">// default: false, Set to true to enabling logging</span>
+        <span class="nx">debug</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>           
+        <span class="c1">// default: false, Set to true to delay event firing</span>
+        <span class="nx">delay</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>           
+        <span class="c1">// default: empty array, Add </span>
+        <span class="nx">events</span><span class="o">:</span> <span class="p">[],</span>             
+        <span class="c1">// default: object, </span>
+        <span class="nx">provider</span><span class="o">:</span> <span class="p">{}</span>            
+    <span class="p">});</span>
 </pre></div>
 
-<h2>Testing</h2>
+<h2>Tracking events through the DOM</h2>
 
-<div class="highlight"><pre>  grunt 
+<div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">capture</span> <span class="o">=</span> <span class="nx">Capture</span><span class="p">({</span>
+        <span class="nx">events</span><span class="o">:</span> <span class="p">[{</span>
+            <span class="c1">// helpful for debugging purposes when something fails</span>
+            <span class="nx">id</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="c1">// helpful when dynamically adding items to the dom</span>
+            <span class="c1">// defaults to 'body'</span>
+            <span class="nx">parent_selector</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+            <span class="c1">// selector to attach action to</span>
+            <span class="nx">selector</span><span class="o">:</span> <span class="s1">''</span>
+            <span class="c1">// type of user interaction</span>
+            <span class="nx">action</span><span class="o">:</span> <span class="s1">'click'</span><span class="p">,</span>
+            <span class="c1">// type of event </span>
+            <span class="nx">type</span><span class="o">:</span> <span class="s1">'track'</span><span class="p">,</span>
+            <span class="c1">// properties to send with the event</span>
+            <span class="nx">props</span><span class="o">:</span> <span class="p">{</span>
+                <span class="c1">// required</span>
+                <span class="nx">category</span><span class="o">:</span> <span class="s1">'insert_category'</span><span class="p">,</span>
+                <span class="c1">// properties can be functions</span>
+                <span class="c1">// function are calling on user interaction with </span>
+                <span class="c1">// the context of the interacted element                        </span>
+                <span class="nx">action</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'href'</span><span class="p">);</span>
+                <span class="p">},</span>
+                <span class="c1">// optional</span>
+                <span class="nx">opt_label</span><span class="o">:</span> <span class="s1">'insert_opt_label'</span><span class="p">,</span>
+                <span class="nx">opt_value</span><span class="o">:</span> <span class="s1">'insert_opt_value'</span><span class="p">,</span>
+                <span class="nx">opt_noninteraction</span><span class="o">:</span> <span class="s1">'insert_opt_noninteraction'</span>
+            <span class="p">}</span>
+        <span class="p">}]</span>
+    <span class="p">})</span>
+</pre></div>
+
+<h2>Tracking events through Javascript</h2>
+
+<div class="highlight"><pre>
+    <span class="c1">// create an instance of Capture</span>
+    <span class="kd">var</span> <span class="nx">capture</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Capture</span><span class="p">();</span>
+
+    <span class="c1">// track an event</span>
+    <span class="nx">capture</span><span class="p">.</span><span class="nx">track</span><span class="p">({</span>
+        <span class="c1">// required</span>
+        <span class="nx">category</span><span class="o">:</span> <span class="s1">'insert_category'</span><span class="p">,</span>                        
+        <span class="nx">action</span><span class="o">:</span> <span class="s1">'insert_action'</span><span class="p">,</span>
+        <span class="c1">// optional</span>
+        <span class="nx">opt_label</span><span class="o">:</span> <span class="s1">'insert_opt_label'</span><span class="p">,</span>
+        <span class="nx">opt_value</span><span class="o">:</span> <span class="s1">'insert_opt_value'</span><span class="p">,</span>
+        <span class="nx">opt_noninteraction</span><span class="o">:</span> <span class="s1">'insert_opt_noninteraction'</span>
+    <span class="p">});</span>
+
+    <span class="c1">// track a pageview</span>
+    <span class="nx">capture</span><span class="p">.</span><span class="nx">pageview</span><span class="p">({</span>
+        <span class="c1">// optional</span>
+        <span class="nx">url</span><span class="o">:</span> <span class="s1">'insert_url'</span>
+    <span class="p">});</span>
+
+</pre></div>
+
+<h2>Contributing to the project</h2>
+
+<p>Getting setup locally</p>
+
+<div class="highlight"><pre>    git clone https://github.com/eatarandom/capture.git
+    <span class="nb">cd </span>capture
+    npm install and bower install
+</pre></div>
+
+<p>Running unit tests</p>
+
+<div class="highlight"><pre>    grunt <span class="nb">test</span>
 </pre></div>
       </section>
       <footer>
