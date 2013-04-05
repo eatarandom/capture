@@ -10,12 +10,28 @@
  	<meta name='description' content=''>
  	<meta name='viewport' content='width=device-width'>
  	<style>
-
+		body {
+			font-family: 'Helvetica', sans-serif;
+		}
+		ul {
+			list-style:none;
+			margin:0;
+			padding:0;
+		}
+		ul, li {
+			padding:5px;
+		}
+		a {
+			text-decoration: none;
+		}
+		a:hover {
+			text-decoration:underline;
+		}
 	</style>
 </head>
 <body>
  	<h1> 
- 		Capture
+ 		Capture Dom Examples
  	</h1>
  	<ul>
  		<li><a class="test-link a" href="/test-link-a">Hover to trigger a track event</a></li>
@@ -35,23 +51,7 @@
 
  	<script>
 
- 		var captureConfig = 
-		[{
-			'id': '10',
-			'delay': false,
-			'selector': '.test-link',
-			'action': 'click',
-			'type': 'track',
-			'props': {
-		    	category: 'every link should click',
-		    	action: function() {
-			    	return $(this).attr('href');
-			    },
-			    opt_label: 'opt_label',
-			    opt_value: 'opt_value',
-			    opt_noninteraction: 'opt_noninteraction'
-			}	
-		}, {
+ 		var eventsConfig = [{
 			'id': '100',
 			'delay': false,
 			'selector': '.test-link.a',
@@ -94,12 +94,13 @@
 			}
 		}];
 
-
- 		var capture = new Capture(captureConfig, {
+ 		var capture = new Capture({
  			// debug mode ?
  			debug: true,
  			// delay
  			delay: true,
+ 			// events config
+ 			config: eventsConfig
  			//providers
  			// provider: {
  			// 	name: 'GoogleAnalytics',

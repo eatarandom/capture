@@ -38,7 +38,7 @@
 				// required
 				category: 'insert_category',
 				// properties can be functions
-				// function are calling on user interaction with 
+				// functions are called on user interaction with 
 				// the context of the interacted element						
 		    	action: function() {
 					return $(this).attr('href');
@@ -80,8 +80,9 @@
 
 
 ## Contributing to the project
+First, ensure that you have the latest [Node.js](http://nodejs.org/) and [npm](https://npmjs.org/) installed. If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide.
 
-Getting setup locally
+### Getting setup locally
 
 ```bash
   	git clone https://github.com/eatarandom/capture.git

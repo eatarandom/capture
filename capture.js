@@ -33,19 +33,14 @@
             props: {}
         };
 
-    // Maybe do something with this?
-    var supportedActions = ['click', 'mouseover'];
 
-    // Maybe do something with this?
-    var supportedTypes = ['track', 'pageview'];
 
-    // Store CaptureEvents for internal use.
-    // TODO: captureEvents array should be Capture instance specific
-    var captureEvents = [];
 
-    // Store Providers for internal use.
-    // TODO: providers array should be Capture instance specific
-    var providers = [];
+
+
+
+
+
 
     // ## Internal Helper Methods
 
@@ -129,6 +124,18 @@
         return obj;
     };
 
+    // #### Each
+    // TODO: make this happen
+    var each = function () {};
+
+
+
+
+
+
+
+
+
 
     // ## Internal Methods
 
@@ -148,7 +155,6 @@
                     for (var i = 0, j = subjects[name].length; i < j; i++) {
                         var subject = subjects[name][i];
                         subject.callback.call(context, props);
-                        //console.log('publishing ' + name + ' ' + props);
                     }   
                 }
             },
@@ -161,7 +167,6 @@
                     context: this,
                     callback: callback
                 });
-                //console.log('subscribing ' + name + ' ' + callback);
             }
         });
 
@@ -174,6 +179,14 @@
         };
 
     }).call(root);
+
+
+
+
+
+
+
+
 
 
     // ### CaptureEvent
@@ -214,38 +227,72 @@
         }
     
     }));
-    
+
+
+
+
+
 
 
 
 
 
     // ### Provider
-    // Class for Providers.
+    // Class for Providers to extend. This class should be instantiated.
     function Provider(options) {}
     
     extend(Provider.prototype, extend(Events, {
-    
+        
         initialize: function () {
             this.mediator.subscribe(this.evt.track, this.track);
             this.mediator.subscribe(this.evt.pageview, this.pageview);
-        },
-
-        track: function () {},
-
-        pageview: function () {}
+        }
 
     })); 
 
 
-    // ## Capture   
-    function Capture(config, options) {
-        this.version = VERSION;
 
-        if (!config || typeof config === 'object' && !config.length) {
-            options = config;
-        } else {
-            this.config = config;     
+
+
+
+
+
+
+
+    function GoogleAnalyticsProvider(options) {
+        this.initialize.apply(this, arguments);
+    }
+
+    extend(GoogleAnalyticsProvider.prototype, extend(Provider.prototype, {
+
+        track: function (props) {
+            console.log('gaq track ', props);
+        },
+
+        pageview: function (props) {
+            console.log('gaq pageview ', props);
+        }
+
+    }));
+
+
+
+
+
+
+
+
+
+
+    // ## Capture   
+    function Capture(options) {
+        this.version = VERSION;
+        this.events = [];
+        // just to test provider
+        // TODO: make this legit
+        this.providers = [new GoogleAnalyticsProvider()];
+        if (options.config && options.config.length) {
+            this.config = options.config;
         }
         extend(this, extend(defaults, options));
         this.initialize.call(this);
@@ -254,52 +301,47 @@
     extend(Capture.prototype, extend(Events, {
 
         initialize: function () {
-            this.mediator.subscribe(this.evt.track, this.track);
-            this.mediator.subscribe(this.evt.pageview, this.pageview);
-            
             if (this.config && this.config.length) {
                 for (var i = 0, j = this.config.length; i < j; i++) {
-                    this.addCaptureEvent(this.config[i]);
+                    this.addEvent(this.config[i]);
                 }   
             }
         },
         
         // TODO: distinguish bewten dom based event and javascript based event?
         // TODO: error check this so a new event isn't created unless it valid
-        addCaptureEvent: function (capture_event) {
-            var cEvents = captureEvents,
-                length = cEvents.length,
+        addEvent: function (capture_event) {
+            var events = this.events,
+                length = events.length,
                 cEvent = new CaptureEvent(capture_event); 
-            cEvents[length] = cEvent;
+            events[length] = events;
             //log.call(this, 'Added a new CaptureEvent ', cEvent);
             return cEvent;
         },
         
-        removeCaptureEvent: function (cid) {
-            for (var i = 0, l = captureEvents.length; i < l; i++) {
-                var ce = captureEvents[i];
-                if (ce.cid === cid) {
-                    return ce;
-                }
-            }
+        // TODO: make sure to remove events when removing
+        removeEvent: function (cid) {
             return false;
         },
         
-        // should just be a wrapper to call providers 
         track: function (props) {
-            //this.trigger('track', options, this);
-            console.log('tracking', props);
+            this.mediator.publish('track', props, this);
         },
         
-        // should just be a wrapper to call providers 
         pageview: function (props) {
-            //this.trigger('pageview', options, this);
-            console.log('pageview', props);
+            this.mediator.publish('pageview', props, this);
         }
 
     }));
-   
-    
+
+
+
+
+
+
+
+
+
 
     // ## Expose to the world
 
