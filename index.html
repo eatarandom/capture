@@ -9,17 +9,26 @@
  	<title>Capture</title>
  	<meta name='description' content=''>
  	<meta name='viewport' content='width=device-width'>
+ 	<style>
+ 		a {
+ 			display:block;
+ 		}
+	</style>
 </head>
 <body>
- 	<h1> Capture </h1>
-	<a class="test-link a" href="/test-link-a">Test link a</a>
-	<a class="test-link b" href="/test-link-b">Test link a b</a>
-	<a class="test-link c" href="/test-link-c">Test link c</a>
-
+ 	<h1> 
+ 		Capture 
+ 	</h1>
+	<a class="test-link a" href="/test-link-a">Hover to trigger a track event</a>
+	<a class="test-link b" href="/test-link-b">Click to trigger a pageview</a>
+	<a class="test-link c" href="/test-link-c">Click to trigger a track event &amp; a pageview</a>
+	<a class="test-link d" href="/test-link-d">Click to trigger a track event from javascript</a>
 
  	<script src="components/underscore/underscore-min.js"></script>
  	<script src="components/zepto/zepto.min.js"></script> 	
  	<script src="src/capture.js"></script>
+	
+	
 
  	<!-- init capture -->
 
@@ -30,10 +39,25 @@
  		
  		var captureConfig = 
 		[{
+			'id': '10',
+			'delay': false,
+			'selector': '.test-link',
+			'action': 'click',
+			'type': 'track',
+			'props': {
+		    	category: 'every link should click',
+		    	action: function() {
+			    	return $(this).attr('href');
+			    },
+			    opt_label: 'opt_label',
+			    opt_value: 'opt_value',
+			    opt_noninteraction: 'opt_noninteraction'
+			}	
+		}, {
 			'id': '100',
 			'delay': false,
 			'selector': '.test-link.a',
-			'action': 'click',
+			'action': 'mouseover',
 			'type': 'track',
 			'props': {
 		    	category: 'category',
@@ -44,32 +68,32 @@
 			    opt_value: 'opt_value',
 			    opt_noninteraction: 'opt_noninteraction'
 			}
-		// }, {
-		// 	'id': '101',
-		// 	'delay': true,
-		// 	'selector': '.test-link.b',
-		// 	'action': 'click',
-		// 	'type': 'pageview',
-		// 	'props': {
-		//     	category: 'category',
-		//     	action: 'action',
-		// 	    opt_label: 'opt_label',
-		// 	    opt_value: 1,
-		// 	    opt_noninteraction: true
-		// 	}
-		// }, {
-		// 	'id': '209',
-		// 	'delay': true,
-		// 	'selector': '.test-link.c',
-		// 	'action': 'mouseover',
-		// 	'type': 'track',
-		// 	'props': {
-		//     	category: 'category',
-		//     	action: 'action',
-		// 	    opt_label: 'opt_label',
-		// 	    opt_value: 0,
-		// 	    opt_noninteraction: false
-		// 	}
+		}, {
+			'id': '101',
+			'delay': true,
+			'selector': '.test-link.b',
+			'action': 'click',
+			'type': 'pageview',
+			'props': {
+		    	category: 'category',
+		    	action: 'action',
+			    opt_label: 'opt_label',
+			    opt_value: 1,
+			    opt_noninteraction: true
+			}
+		}, {
+			'id': '209',
+			'delay': true,
+			'selector': '.test-link.c',
+			'action': 'click',
+			'type': ['track', 'pageview'],
+			'props': {
+		    	category: 'category',
+		    	action: 'action',
+			    opt_label: 'opt_label',
+			    opt_value: 0,
+			    opt_noninteraction: false
+			}
 		}];
 
 
@@ -86,6 +110,18 @@
  		});
 		
  		//var c = new CaptureEvent(captureConfig[0]);
+
+ 		$('.test-link').on('click', '.d', function(e) {
+
+ 			e.preventDefault();
+
+ 			capture.track({
+ 				'category': 'from javascript',
+ 				'action': $(this).attr('href'),
+ 				'opt_label': 'opt_label'
+ 			});
+
+ 		});
 
  	</script>
 

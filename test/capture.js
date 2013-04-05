@@ -1,8 +1,8 @@
 var Capture = require("../src/capture");
 
 exports.capture = {
-
-	"empty initialization": function (test) {
+	
+	/*"empty initialization": function (test) {
 		test.expect(3);
 		
 		var capture = new Capture();
@@ -26,6 +26,6 @@ exports.capture = {
 		test.equal(capture.delay, true, 'property debug should equal true');		
 		
 		test.done();
-	}
+	}*/
 
 };

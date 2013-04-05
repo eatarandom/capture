@@ -13,6 +13,9 @@
     // Store a reference to `window` or `global` on the server.
     var root = this;
 
+    // Reference to 
+    var $ = root.Zepto || root.jQuery || root.$;
+
     // Current capture version.
     var VERSION = '0.0.1';
 
@@ -21,7 +24,7 @@
             debug: false,
             delay: false
         };
-        
+    
     // CaptureEvent default properties. 
     var captureEventDefaults = {
             selector: 'body',
@@ -30,11 +33,18 @@
             props: {}
         };
 
+    // 
+    var supportedActions = ['click', 'mouseover'];
+
+    //
+    var supportedTypes = ['track', 'pageview'];
+
     // Store CaptureEvents for internal use.
-    // Note: CaptureEvents are stored for multiple instances of Capture.
+    // TODO: captureEvents array should be Capture instance specific
     var captureEvents = [];
 
     // Store Providers for internal use.
+    // TODO: providers array should be Capture instance specific
     var providers = [];
 
     // ## Helper Methods
@@ -109,8 +119,9 @@
     // Otherwise, keep the key/value the same.
     var results = function (obj, context) {
         var ctx = context || root; // leak of scope here, fix
-        
-        for (var i = 0, j = keys(obj).length; i < j; i++) {
+        var kys = keys(obj);
+        for (var i = 0, j = kys.length; i < j; i++) {
+            var key = kys[i];
             if (typeof obj[key] === 'function') {
                 obj[key] = obj[key].call(context);
             }   
@@ -131,23 +142,26 @@
         }
 
         extend(Mediator.prototype, {
-            publish: function (name, options, context) {
-                if (this.subjects.hasOwnProperty(name)) {
-                    for (var i = 0, j = this.subjects[name].length; i < j; i++) {
-                        var subject = this.subjects[name][i];
-                        subject.callback.call(context, arguments);
+            publish: function (name, props, context) {
+                var subjects = this.subjects;
+                if (subjects.hasOwnProperty(name)) {
+                    for (var i = 0, j = subjects[name].length; i < j; i++) {
+                        var subject = subjects[name][i];
+                        subject.callback.call(context, props);
+                        //console.log('publishing ' + name + ' ' + props);
                     }   
                 }
             },
-            subscribe: function (name, callback, context) {
-                name = name.toString();
-                if (!this.subjects.hasOwnProperty(name)) {
-                    this.subjects[name] = [];    
+            subscribe: function (name, callback) {
+                var subjects = this.subjects;
+                if (!subjects.hasOwnProperty(name)) {
+                    subjects[name] = [];    
                 }
-                this.subjects[name].push({
+                subjects[name].push({
                     context: this,
                     callback: callback
                 });
+                //console.log('subscribing ' + name + ' ' + callback);
             }
         });
 
@@ -163,7 +177,8 @@
 
 
     // ### CaptureEvent
-    // Class for CaptureEvents.
+    // Class for CaptureEvents. Assumed now to be events based on dom interaction. See todos.
+    // TODO: distinguish events bewteen dom based or javascript based?
     function CaptureEvent(options) {
         this.cid = uniqueId('ce');
         extend(this, extend(captureEventDefaults, options)); 
@@ -174,11 +189,28 @@
     extend(CaptureEvent.prototype, extend(Events, {
 
         initialize: function () {
-            this.triggerEvent();
+            var self = this;
+
+            this.selector = $(this.selector);
+            if (!this.selector || !this.selector.length) {
+                throw new Error('CaptureEvent' + this.id + 'needs a valid selector');
+            }
+            if (typeof this.type === 'string') {
+                this.type = this.type.split();
+            }
+            this.selector.on(this.action, function (event) {
+                self.publish(event);
+            });
         },
 
-        triggerEvent: function () {
-            this.mediator.publish(this.type, results(this.props, this), this);
+        publish: function (event) {
+            // remove in production
+            event.preventDefault();    
+
+            for (var i = 0, j = this.type.length; i < j; i++) {
+                this.mediator.publish(this.type[i], results(this.props, event.target), this);    
+            }
+
         }
     
     }));
@@ -195,8 +227,8 @@
     extend(Provider.prototype, extend(Events, {
     
         initialize: function () {
-            this.on('track', this.track);
-            this.on('pageview', this.pageview);
+            this.mediator.subscribe(this.evt.track, this.track);
+            this.mediator.subscribe(this.evt.pageview, this.pageview);
         },
 
         track: function () {},
@@ -206,10 +238,7 @@
     })); 
 
 
-    // ## Capture 
-
-    // #### Contstuctor
-    
+    // ## Capture   
     function Capture(config, options) {
         this.version = VERSION;
 
@@ -224,10 +253,9 @@
 
     extend(Capture.prototype, extend(Events, {
 
-        // __Initialize__
         initialize: function () {
-            this.mediator.subscribe('track', this.track);
-            this.mediator.subscribe('pageview', this.pageview);
+            this.mediator.subscribe(this.evt.track, this.track);
+            this.mediator.subscribe(this.evt.pageview, this.pageview);
             
             if (this.config && this.config.length) {
                 for (var i = 0, j = this.config.length; i < j; i++) {
@@ -236,12 +264,14 @@
             }
         },
         
+        // TODO: distinguish bewten dom based event and javascript based event?
+        // TODO: error check this so a new event isn't created unless it valid
         addCaptureEvent: function (capture_event) {
             var cEvents = captureEvents,
                 length = cEvents.length,
                 cEvent = new CaptureEvent(capture_event); 
             cEvents[length] = cEvent;
-            log.call(this, 'Added a new CaptureEvent ', cEvent);
+            //log.call(this, 'Added a new CaptureEvent ', cEvent);
             return cEvent;
         },
         
@@ -256,15 +286,15 @@
         },
         
         // should just be a wrapper to call providers 
-        track: function (options) {
+        track: function (props) {
             //this.trigger('track', options, this);
-            //console.log('hey i\'m tracking', options);
+            console.log('tracking', props);
         },
         
         // should just be a wrapper to call providers 
-        pageview: function (options) {
+        pageview: function (props) {
             //this.trigger('pageview', options, this);
-            //console.log('hey i\'m pageview', options);
+            console.log('pageview', props);
         }
 
     }));

@@ -2,7 +2,7 @@ var Capture = require('../../src/capture');
 
 exports.captureevent = {
 
-	"initialize": function (test) {
+	/*"initialize": function (test) {
 		test.expect(2);
 		test.ok(true, 'should pass');
 		
@@ -14,6 +14,6 @@ exports.captureevent = {
 		test.equal(cEvent.cid, 'ce2', 'cid should be ce2');
 
 		test.done();
-	}
+	}*/
 
 };
