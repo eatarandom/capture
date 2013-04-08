@@ -139,8 +139,14 @@
     };
 
     // #### Each
-    // TODO: make this happen
-    var each = function () {};
+    // Loop through an array.
+    var each = function (obj, callback, context) {
+        var i = 0,
+            j = obj.length;
+        for (i; i < j; i++) {
+            callback.call(context, obj[i], i, obj);
+        }
+    };
 
 
     // ## Internal Methods
@@ -158,10 +164,13 @@
             publish: function (name, props, context) {
                 var subjects = this.subjects;
                 if (subjects.hasOwnProperty(name)) {
-                    for (var i = 0, j = subjects[name].length; i < j; i++) {
-                        var subject = subjects[name][i];
+                    each(subjects[name], function (subject) {
                         subject.callback.call(context, props);
-                    }
+                    });
+                    // for (var i = 0, j = subjects[name].length; i < j; i++) {
+                    //     var subject = subjects[name][i];
+                    //     subject.callback.call(context, props);
+                    // }
                 }
                 //console.log('publish', name, props);
             },
@@ -218,12 +227,16 @@
         },
 
         publish: function (event) {
+            var self = this;
             // remove in production
             event.preventDefault();
 
-            for (var i = 0, j = this.type.length; i < j; i++) {
-                this.mediator.publish(this.type[i], results(this.props, event.target), this);
-            }
+            each(self.type, function (type) {
+                self.mediator.publish(type, results(self.props, event.target), self);
+            });
+            // for (var i = 0, j = this.type.length; i < j; i++) {
+            //     this.mediator.publish(this.type[i], results(this.props, event.target), this);
+            // }
         }
 
     }));
@@ -308,15 +321,20 @@
 
             if (opts) {
                 if (oEvents && oEvents.length) {
-                    for (var i = 0, j = oEvents.length; i < j; i++) {
-                        self.events.push(self.addEvent(oEvents[i]));
-                    }
+                    each(oEvents, function (oEvent) {
+                        self.events.push(self.addEvent(oEvent));
+                    });
+                    // for (var i = 0, j = oEvents.length; i < j; i++) {
+                    //     self.events.push(self.addEvent(oEvents[i]));
+                    // }
                 }
-
                 if (oProviders && oProviders.length) {
-                    for (var k = 0, l = oProviders.length; k < l; k++) {
-                        self.providers.push(self.addProvider(oProviders[k]));
-                    }
+                    each(oProviders, function (oProvider) {
+                        self.providers.push(self.addProvider(oProvider));
+                    });
+                    // for (var k = 0, l = oProviders.length; k < l; k++) {
+                    //     self.providers.push(self.addProvider(oProviders[k]));
+                    // }
                 }
             }
         },
