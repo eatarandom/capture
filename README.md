@@ -10,10 +10,10 @@
 		debug: false,			
 		// default: false, Set to true to delay event firing
 		delay: false,			
-		// default: empty array, Add 
+		// default: array 
 		events: [],				
-		// default: object, 
-		provider: {}			
+		// default: array, 
+		providers: []			
 	});
 ```
 
@@ -63,11 +63,11 @@
 	capture.track({
 		// required
 		category: 'insert_category',						
-    	action: 'insert_action',
-	    // optional
-	    opt_label: 'insert_opt_label',
-	    opt_value: 'insert_opt_value',
-	    opt_noninteraction: 'insert_opt_noninteraction'
+    		action: 'insert_action',
+	    	// optional
+	    	opt_label: 'insert_opt_label',
+	    	opt_value: 'insert_opt_value',
+	    	opt_noninteraction: 'insert_opt_noninteraction'
 	});
 	
 	// track a pageview
