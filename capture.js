@@ -7,7 +7,7 @@
 // 
 
 (function () {
-    
+
     "use strict";
 
     // Store a reference to `window` or `global` on the server.
@@ -21,44 +21,36 @@
 
     // Default properties.
     var defaults = {
-            debug: false,
-            delay: false
-        };
-    
+        debug: false,
+        delay: false
+    };
+
     // CaptureEvent default properties. 
     var captureEventDefaults = {
-            selector: 'body',
-            action: 'click',
-            type: 'track',
-            props: {}
-        };
-
-
-
-
-
-
-
-
+        selector: 'body',
+        action: 'click',
+        type: 'track',
+        props: {}
+    };
 
 
     // ## Internal Helper Methods
 
     // #### Log
     // A safe way to console log.
-    
+
     // Credit to __Paul Irish__.
     // Reference: [Log. A lightweight wrapper for console.log](http://paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/)
     var log = function () {
         if (this.debug) {
-            log.history = log.history || [];   // store logs to an array for reference
+            log.history = log.history || []; // store logs to an array for reference
             log.history.push(arguments);
             if (root.console) {
                 console.log(Array.prototype.slice.call(arguments));
-            }     
+            }
         }
     };
-        
+
     // __Extend__ an object with some new properties.
     var extend = function (a, b) {
         for (var i in b) {
@@ -69,9 +61,30 @@
         return a;
     };
 
+    // __Inherit__ from a super class.
+    var inherits = function (props) {
+        var parent = this,
+            child = function () {
+                return parent.apply(this, arguments);
+            };
+
+        extend(child, parent);
+
+        var Surrogate = function () {
+            this.constructor = child;
+        };
+        Surrogate.prototype = parent.prototype;
+        child.prototype = new Surrogate();
+
+        if (props) extend(child.prototype, props);
+
+        child.__super__ = parent.prototype;
+
+        return child;
+    };
 
     // Create and return a __uniqueId__.
-    
+
     // Credit the authors of __Underscore.js__ 
     // Reference `_.uniqueId()` from [Underscore.js](https://github.com/documentcloud/underscore)
     var idCounter = 0;
@@ -82,25 +95,26 @@
 
     // #### Keys
     // Return the keys on an object.
-    
+
     // Credit the authors of __Underscore.js__ 
     // Reference `_.keys(obj)` [Underscore.js](https://github.com/documentcloud/underscore)
     var keys = Object.keys || function (obj) {
-        if (obj !== Object(obj)) {
-            throw new TypeError('Invalid object');
-        }
-        var keys = [];
-        for (var key in obj) {
-            if (has(obj, key)) {
-                keys[keys.length] = key;
+            if (obj !== Object(obj)) {
+                throw new TypeError('Invalid object');
             }
-        }
-        return keys;
-    };
+            var keys = [];
+            for (var key in obj) {
+                if (has(obj, key)) {
+                    keys[keys.length] = key;
+                }
+            }
+            return keys;
+        };
+
 
     // #### Has
     // Does an object have a key.
-    
+
     // Credit the authors of __Underscore.js__ 
     // Reference `_.keys(obj)` [Underscore.js](https://github.com/documentcloud/underscore)
     var has = function (obj, key) {
@@ -119,7 +133,7 @@
             var key = kys[i];
             if (typeof obj[key] === 'function') {
                 obj[key] = obj[key].call(context);
-            }   
+            }
         }
         return obj;
     };
@@ -129,23 +143,15 @@
     var each = function () {};
 
 
-
-
-
-
-
-
-
-
     // ## Internal Methods
 
     // ### Events
     // Events Mediator shared throughout Capture.
-    
+
     var Events = (function () {
 
-        function Mediator() { 
-            this.subjects = {}; 
+        function Mediator() {
+            this.subjects = {};
         }
 
         extend(Mediator.prototype, {
@@ -155,18 +161,20 @@
                     for (var i = 0, j = subjects[name].length; i < j; i++) {
                         var subject = subjects[name][i];
                         subject.callback.call(context, props);
-                    }   
+                    }
                 }
+                //console.log('publish', name, props);
             },
             subscribe: function (name, callback) {
                 var subjects = this.subjects;
                 if (!subjects.hasOwnProperty(name)) {
-                    subjects[name] = [];    
+                    subjects[name] = [];
                 }
                 subjects[name].push({
                     context: this,
                     callback: callback
                 });
+                // console.log('subscribe', name);
             }
         });
 
@@ -181,20 +189,13 @@
     }).call(root);
 
 
-
-
-
-
-
-
-
-
     // ### CaptureEvent
     // Class for CaptureEvents. Assumed now to be events based on dom interaction. See todos.
-    // TODO: distinguish events bewteen dom based or javascript based?
+    // TODO distinguish events bewteen dom based or javascript based?
+
     function CaptureEvent(options) {
         this.cid = uniqueId('ce');
-        extend(this, extend(captureEventDefaults, options)); 
+        extend(this, extend(captureEventDefaults, options));
         if (this.id < 0) this.id = this.cid;
         this.initialize.call(this);
     }
@@ -218,52 +219,63 @@
 
         publish: function (event) {
             // remove in production
-            event.preventDefault();    
+            event.preventDefault();
 
             for (var i = 0, j = this.type.length; i < j; i++) {
-                this.mediator.publish(this.type[i], results(this.props, event.target), this);    
+                this.mediator.publish(this.type[i], results(this.props, event.target), this);
             }
-
         }
-    
+
     }));
 
 
-
-
-
-
-
-
-
-
     // ### Provider
-    // Class for Providers to extend. This class should be instantiated.
-    function Provider(options) {}
-    
-    extend(Provider.prototype, extend(Events, {
-        
-        initialize: function () {
-            this.mediator.subscribe(this.evt.track, this.track);
-            this.mediator.subscribe(this.evt.pageview, this.pageview);
-        }
+    // Class for Providers to extend.
 
-    })); 
-
-
-
-
-
-
-
-
-
-
-    function GoogleAnalyticsProvider(options) {
+    function Provider(options) {
+        this.cid = uniqueId('provider');
+        this.options = options;
         this.initialize.apply(this, arguments);
     }
 
-    extend(GoogleAnalyticsProvider.prototype, extend(Provider.prototype, {
+    extend(Provider.prototype, extend(Events, {
+
+        initialize: function () {
+            this.mediator.subscribe(this.evt.track, this.track);
+            this.mediator.subscribe(this.evt.pageview, this.pageview);
+            this.setup.call(this);
+        },
+        setup: function () {},
+        track: function () {},
+        pageview: function () {}
+
+    }));
+
+    Provider.extend = inherits;
+
+
+    // ### Providers
+
+    var GAQProvider = Provider.extend({
+
+        initialize: function (options) {
+            // super
+            Provider.prototype.initialize.apply(this, arguments);
+
+            var _gaq = root._gaq;
+
+            _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-11']);
+            _gaq.push(['_trackPageview']);
+
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+
+        },
 
         track: function (props) {
             console.log('gaq track ', props);
@@ -273,61 +285,62 @@
             console.log('gaq pageview ', props);
         }
 
-    }));
-
-
-
-
-
-
-
-
+    });
 
 
     // ## Capture   
+
     function Capture(options) {
         this.version = VERSION;
         this.events = [];
-        // just to test provider
-        // TODO: make this legit
-        this.providers = [new GoogleAnalyticsProvider()];
-        if (options.config && options.config.length) {
-            this.config = options.config;
-        }
+        this.providers = [];
         extend(this, extend(defaults, options));
-        this.initialize.call(this);
+        this.initialize.apply(this, arguments);
     }
 
     extend(Capture.prototype, extend(Events, {
 
-        initialize: function () {
-            if (this.config && this.config.length) {
-                for (var i = 0, j = this.config.length; i < j; i++) {
-                    this.addEvent(this.config[i]);
-                }   
+        initialize: function (options) {
+            var opts = options,
+                self = this,
+                oEvents = opts.events,
+                oProviders = opts.providers;
+
+            if (opts) {
+                if (oEvents && oEvents.length) {
+                    for (var i = 0, j = oEvents.length; i < j; i++) {
+                        self.events.push(self.addEvent(oEvents[i]));
+                    }
+                }
+
+                if (oProviders && oProviders.length) {
+                    for (var k = 0, l = oProviders.length; k < l; k++) {
+                        self.providers.push(self.addProvider(oProviders[k]));
+                    }
+                }
             }
         },
-        
-        // TODO: distinguish bewten dom based event and javascript based event?
-        // TODO: error check this so a new event isn't created unless it valid
+
+        addProvider: function (provider) {
+            var Surrogate = Provider.extend(provider.methods);
+            return new Surrogate(provider.options);
+        },
+
+        removeProvider: function (cid) {},
+
+        // TODO distinguish bewten dom based event and javascript based event?
+        // TODO error check this so a new event isn't created unless it valid
         addEvent: function (capture_event) {
-            var events = this.events,
-                length = events.length,
-                cEvent = new CaptureEvent(capture_event); 
-            events[length] = events;
-            //log.call(this, 'Added a new CaptureEvent ', cEvent);
-            return cEvent;
+            return new CaptureEvent(capture_event);
         },
-        
+
         // TODO: make sure to remove events when removing
-        removeEvent: function (cid) {
-            return false;
-        },
-        
+        removeEvent: function (cid) {},
+
         track: function (props) {
             this.mediator.publish('track', props, this);
         },
-        
+
         pageview: function (props) {
             this.mediator.publish('pageview', props, this);
         }
@@ -335,19 +348,11 @@
     }));
 
 
-
-
-
-
-
-
-
-
     // ## Expose to the world
 
     // CommonJS
     var CommonJS = false;
-    if (typeof module !== 'undefined' && module.exports) { 
+    if (typeof module !== 'undefined' && module.exports) {
         module.exports = Capture;
         CommonJS = true;
     }
@@ -363,7 +368,7 @@
 
     // Window
     if (!CommonJS && !AMD) {
-        root.Capture = Capture;   
+        root.Capture = Capture;
     }
-    
+
 }).call(this);

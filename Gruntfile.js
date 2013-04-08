@@ -17,6 +17,14 @@ module.exports = function (grunt) {
 			homepage: '<%= pkg.homepage %>' 
 		},
 
+		clean: {
+			release: [
+				"docs", 
+				"capture.min.js",
+				"capture.js"
+			]
+		},
+
 		docco: {
 			debug: {
 				src: ['capture.js'],
@@ -111,6 +119,7 @@ module.exports = function (grunt) {
 	// Release task.
 	grunt.registerTask('release', [
 		'test', 
+		'clean',
 		'replace',
 		'uglify', 
 		'docco'
