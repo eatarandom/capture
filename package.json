@@ -1,6 +1,6 @@
 {
   "name": "Capture",
-  "version": "0.1.1-beta",
+  "version": "0.1.0-beta",
   "description": "Javascript analytics made easy.",
   "scripts": {
     "test": "grunt"
