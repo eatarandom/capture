@@ -32,85 +32,208 @@
 </h1>
 
 <blockquote>
-<p>Javascript analytics made easy. (Currently in development.)</p>
+<p>Javascript analytics made easy.</p>
 </blockquote>
 
-<h2>Getting Started</h2>
+<h2>Overview</h2>
 
-<div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">capture</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Capture</span><span class="p">({</span>
-        <span class="c1">// default: false, Set to true to enabling logging</span>
-        <span class="nx">debug</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>           
-        <span class="c1">// default: false, Set to true to delay event firing</span>
-        <span class="nx">delay</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>           
-        <span class="c1">// default: empty array, Add </span>
-        <span class="nx">events</span><span class="o">:</span> <span class="p">[],</span>             
-        <span class="c1">// default: object, </span>
-        <span class="nx">provider</span><span class="o">:</span> <span class="p">{}</span>            
-    <span class="p">});</span>
-</pre></div>
+<p>Capture aims to provide a single location to configure all DOM event tracking. Capture can be easily used for both <strong>DOM</strong> and <strong>javascript</strong> based analytics.</p>
 
-<h2>Tracking events through the DOM</h2>
+<p><strong>What analytics providers does Capture support?</strong></p>
 
-<div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">capture</span> <span class="o">=</span> <span class="nx">Capture</span><span class="p">({</span>
-        <span class="nx">events</span><span class="o">:</span> <span class="p">[{</span>
-            <span class="c1">// helpful for debugging purposes when something fails</span>
-            <span class="nx">id</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="c1">// helpful when dynamically adding items to the dom</span>
-            <span class="c1">// defaults to 'body'</span>
-            <span class="nx">parent_selector</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
-            <span class="c1">// selector to attach action to</span>
-            <span class="nx">selector</span><span class="o">:</span> <span class="s1">''</span>
-            <span class="c1">// type of user interaction</span>
-            <span class="nx">action</span><span class="o">:</span> <span class="s1">'click'</span><span class="p">,</span>
-            <span class="c1">// type of event </span>
-            <span class="nx">type</span><span class="o">:</span> <span class="s1">'track'</span><span class="p">,</span>
-            <span class="c1">// properties to send with the event</span>
-            <span class="nx">props</span><span class="o">:</span> <span class="p">{</span>
-                <span class="c1">// required</span>
-                <span class="nx">category</span><span class="o">:</span> <span class="s1">'insert_category'</span><span class="p">,</span>
-                <span class="c1">// properties can be functions</span>
-                <span class="c1">// function are calling on user interaction with </span>
-                <span class="c1">// the context of the interacted element                        </span>
-                <span class="nx">action</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="k">return</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'href'</span><span class="p">);</span>
-                <span class="p">},</span>
-                <span class="c1">// optional</span>
-                <span class="nx">opt_label</span><span class="o">:</span> <span class="s1">'insert_opt_label'</span><span class="p">,</span>
-                <span class="nx">opt_value</span><span class="o">:</span> <span class="s1">'insert_opt_value'</span><span class="p">,</span>
-                <span class="nx">opt_noninteraction</span><span class="o">:</span> <span class="s1">'insert_opt_noninteraction'</span>
+<blockquote>
+<p>Capture currently has built in support Google Analytics. However, Capture also supports adding your own provider. In future releases, there will be more built in providers.</p>
+</blockquote>
+
+<p><strong>What is required to use Capture?</strong></p>
+
+<blockquote>
+<p>There's no need to go and look at the <a href="https://developers.google.com/analytics/devguides/collection/gajs/">Google Analytics</a> documentation. The dependacies are currently handled internally by Capture. The only thing required to use Capture is a Google Analytics account number.</p>
+</blockquote>
+
+<h3>Basic setup for handling DOM analytics</h3>
+
+<div class="highlight"><pre>    <span class="c1">// Create an array of tracking objects to be passed into Capture.</span>
+    <span class="kd">var</span> <span class="nx">eventsConfig</span> <span class="o">=</span> <span class="p">[{</span>
+        <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nx">parent_selector</span><span class="o">:</span> <span class="s1">'header'</span><span class="p">,</span>
+        <span class="nx">selector</span><span class="o">:</span> <span class="s1">'.logo'</span><span class="p">,</span>
+        <span class="nx">action</span><span class="o">:</span> <span class="s1">'click'</span><span class="p">,</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="s1">'track'</span><span class="p">,</span>
+        <span class="nx">props</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">category</span><span class="o">:</span> <span class="s1">'header'</span><span class="p">,</span>
+            <span class="nx">action</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+                <span class="k">return</span> <span class="s1">'click_logo_'</span> <span class="o">+</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span><span class="p">;</span>
+            <span class="p">},</span>
+            <span class="nx">opt_label</span><span class="o">:</span> <span class="s1">'non_non'</span><span class="p">,</span>
+            <span class="nx">opt_value</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="nx">opt_noninteraction</span><span class="o">:</span> <span class="kc">false</span>
+        <span class="p">}</span>
+
+    <span class="p">}];</span>
+
+    <span class="c1">// Create an instance of Capture with an events config using Google Analytics.</span>
+    <span class="kd">var</span> <span class="nx">capture</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Capture</span><span class="p">({</span>
+        <span class="nx">events</span><span class="o">:</span> <span class="nx">eventsConfig</span><span class="p">,</span>
+        <span class="nx">providers</span><span class="o">:</span> <span class="p">[{</span>
+            <span class="nx">name</span><span class="o">:</span> <span class="s1">'gaq'</span><span class="p">,</span>
+            <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
+                <span class="nx">account</span><span class="o">:</span> <span class="s1">'UA-XXXXX-X'</span> 
             <span class="p">}</span>
         <span class="p">}]</span>
-    <span class="p">})</span>
+    <span class="p">});</span>
 </pre></div>
 
-<h2>Tracking events through Javascript</h2>
+<h3>Basic setup for handling javascript analytics</h3>
 
-<div class="highlight"><pre>
-    <span class="c1">// create an instance of Capture</span>
-    <span class="kd">var</span> <span class="nx">capture</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Capture</span><span class="p">();</span>
+<div class="highlight"><pre>    <span class="c1">// Create an instance of Capture using Google Analytics.</span>
+    <span class="kd">var</span> <span class="nx">capture</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Capture</span><span class="p">({</span>
+        <span class="nx">providers</span><span class="o">:</span> <span class="p">[{</span>
+            <span class="nx">name</span><span class="o">:</span> <span class="s1">'gaq'</span><span class="p">,</span>
+            <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
+                <span class="nx">account</span><span class="o">:</span> <span class="s1">'UA-XXXXX-X'</span> 
+            <span class="p">}</span>
+        <span class="p">}]</span>
+    <span class="p">});</span>
 
-    <span class="c1">// track an event</span>
+    <span class="c1">// Capture an event.</span>
     <span class="nx">capture</span><span class="p">.</span><span class="nx">track</span><span class="p">({</span>
-        <span class="c1">// required</span>
-        <span class="nx">category</span><span class="o">:</span> <span class="s1">'insert_category'</span><span class="p">,</span>                        
-        <span class="nx">action</span><span class="o">:</span> <span class="s1">'insert_action'</span><span class="p">,</span>
-        <span class="c1">// optional</span>
-        <span class="nx">opt_label</span><span class="o">:</span> <span class="s1">'insert_opt_label'</span><span class="p">,</span>
-        <span class="nx">opt_value</span><span class="o">:</span> <span class="s1">'insert_opt_value'</span><span class="p">,</span>
-        <span class="nx">opt_noninteraction</span><span class="o">:</span> <span class="s1">'insert_opt_noninteraction'</span>
+        <span class="nx">category</span><span class="o">:</span> <span class="s1">'header'</span><span class="p">,</span>
+        <span class="nx">action</span><span class="o">:</span> <span class="s1">'click_logo_'</span><span class="p">,</span>
+        <span class="nx">opt_label</span><span class="o">:</span> <span class="s1">'non_non'</span><span class="p">,</span>
+        <span class="nx">opt_value</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nx">opt_noninteraction</span><span class="o">:</span> <span class="kc">false</span>   
     <span class="p">});</span>
 
-    <span class="c1">// track a pageview</span>
+    <span class="c1">// Capture a pageview.</span>
     <span class="nx">capture</span><span class="p">.</span><span class="nx">pageview</span><span class="p">({</span>
-        <span class="c1">// optional</span>
-        <span class="nx">url</span><span class="o">:</span> <span class="s1">'insert_url'</span>
+        <span class="nx">url</span><span class="o">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span> 
     <span class="p">});</span>
+</pre></div>
 
+<h2>Options</h2>
+
+<h3>Providers <em>are an array of provider objects</em>.</h3>
+
+<div class="highlight"><pre><span class="nx">providers</span><span class="o">:</span> <span class="p">[{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="nx">options</span><span class="o">:</span> <span class="p">{},</span>
+    <span class="nx">methods</span><span class="o">:</span> <span class="p">{}</span>
+<span class="p">}]</span>
+</pre></div>
+
+<p><strong>Name</strong> <em>string</em></p>
+
+<blockquote>
+<p><strong>Required</strong>. Name of the provider you want to use or are creating.  </p>
+</blockquote>
+
+<div class="highlight"><pre><span class="nx">name</span><span class="o">:</span> <span class="s1">'gaq'</span>
+</pre></div>
+
+<p><strong>Options</strong> <em>object</em></p>
+
+<blockquote>
+<p><strong>Required</strong>. An object of options to pass into the the constructor of the Provider. </p>
+</blockquote>
+
+<div class="highlight"><pre><span class="nx">options</span><span class="o">:</span> <span class="p">{</span> 
+    <span class="nx">account</span><span class="o">:</span> <span class="s1">'UA-XXXXX-X'</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><strong>Methods</strong> <em>object</em></p>
+
+<blockquote>
+<p><strong>Optional</strong>. <em>Recommended for advanced use only</em>. Methods to extend the Provider prototype.</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="nx">methods</span><span class="o">:</span> <span class="p">{</span>
+    <span class="c1">// Automatically called after initialize.</span>
+    <span class="nx">setup</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>Events <em>are an array of event objects</em>.</h3>
+
+<div class="highlight"><pre><span class="nx">events</span><span class="o">:</span> <span class="p">[{</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="nx">parent_selector</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="nx">selector</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="nx">action</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="nx">props</span><span class="o">:</span> <span class="p">{}</span>
+<span class="p">}]</span>
+</pre></div>
+
+<p><strong>Id</strong> <em>number</em></p>
+
+<blockquote>
+<p><strong>Optional</strong>. Used in debugging to track which events failed/succeeded. <em>Support coming in 0.2.0-beta</em>.</p>
+</blockquote>
+
+<div class="highlight"><pre> <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span>
+</pre></div>
+
+<p><strong>Parent selector</strong> <em>string/object</em></p>
+
+<blockquote>
+<p><strong>Optional</strong>. Helpful to speed up selection when dynamically adding elements to the dom. Defaults to 'body'.</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="nx">parent_selector</span><span class="o">:</span> <span class="s1">'section'</span>
+</pre></div>
+
+<p><strong>Selector</strong> <em>string/object</em></p>
+
+<blockquote>
+<p><strong>Required</strong>. Selector that will be have action attached.</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="nx">selector</span><span class="o">:</span> <span class="s1">'a.track'</span>
+</pre></div>
+
+<p><strong>Action</strong> <em>string</em></p>
+
+<blockquote>
+<p><strong>Required</strong>. Dom event to attach to selector.</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="nx">action</span><span class="o">:</span> <span class="s1">'click'</span>
+</pre></div>
+
+<p><strong>Type</strong> <em>string/array</em></p>
+
+<blockquote>
+<p><strong>Required</strong>. Event type(s) that's triggered on user action.</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="nx">type</span><span class="o">:</span> <span class="s1">'track'</span>
+</pre></div>
+
+<p><strong>Props</strong> <em>object</em></p>
+
+<blockquote>
+<p><strong>Required</strong>. Properties to send with the event type. Properties can be functions. If a function, it will be called with the context of the selector.</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="nx">props</span><span class="o">:</span> <span class="p">{</span>
+    <span class="c1">// required</span>
+    <span class="nx">category</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="nx">action</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="c1">// mandatory</span>
+    <span class="nx">opt_label</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+    <span class="nx">opt_value</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="nx">opt_noninteraction</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="s1">''</span><span class="p">,</span>
+<span class="p">}</span>
 </pre></div>
 
 <h2>Contributing to the project</h2>
 
-<p>Getting setup locally</p>
+<p>First, ensure that you have the latest <a href="http://nodejs.org/">Node.js</a> and <a href="https://npmjs.org/">npm</a> installed. If you haven't used <a href="http://gruntjs.com/">Grunt</a> before, be sure to check out the <a href="http://gruntjs.com/getting-started">Getting Started</a> guide.</p>
+
+<h3>Getting setup locally</h3>
 
 <div class="highlight"><pre>    git clone https://github.com/eatarandom/capture.git
     <span class="nb">cd </span>capture
