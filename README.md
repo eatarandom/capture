@@ -4,10 +4,10 @@
 
 ## Overview
 
-Capture aims to provide a single location to configure all DOM event tracking. Capture can be easily used for both __DOM__ and __javascript__ based analytics.
+Capture aims to provide a single location to configure all DOM event tracking. Capture can also be easily used for both __DOM__ and __javascript__ based analytics.
 
 __What analytics providers does Capture support?__
-> Capture currently has built in support Google Analytics. However, Capture also supports adding your own provider. In future releases, there will be more built in providers.
+> Capture currently has built in support for Google Analytics. However, Capture also supports adding your own provider. In future releases, there will be more built in providers.
 
 __What is required to use Capture?__
 > There's no need to go and look at the [Google Analytics](https://developers.google.com/analytics/devguides/collection/gajs/) documentation. The dependacies are currently handled internally by Capture. The only thing required to use Capture is a Google Analytics account number.
