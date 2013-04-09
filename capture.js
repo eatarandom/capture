@@ -20,6 +20,7 @@
     var VERSION = '0.0.1';
 
     // Default properties.
+    // TODO Make this stuff work.
     var defaults = {
         debug: false,
         delay: false
@@ -104,9 +105,7 @@
             }
             var keys = [];
             for (var key in obj) {
-                if (has(obj, key)) {
-                    keys[keys.length] = key;
-                }
+                keys[keys.length] = key;
             }
             return keys;
         };
@@ -148,6 +147,15 @@
         }
     };
 
+    // #### Flatten
+    var flatten = function (obj) {
+        var values = [];
+        for (var key in obj) {
+            values.push(obj[key]);
+        }
+        return values;
+    };
+
 
     // ## Internal Methods
 
@@ -165,25 +173,19 @@
                 var subjects = this.subjects;
                 if (subjects.hasOwnProperty(name)) {
                     each(subjects[name], function (subject) {
-                        subject.callback.call(context, props);
+                        subject.callback.call(subject[context], props, context);
                     });
-                    // for (var i = 0, j = subjects[name].length; i < j; i++) {
-                    //     var subject = subjects[name][i];
-                    //     subject.callback.call(context, props);
-                    // }
                 }
-                //console.log('publish', name, props);
             },
-            subscribe: function (name, callback) {
+            subscribe: function (name, callback, context) {
                 var subjects = this.subjects;
                 if (!subjects.hasOwnProperty(name)) {
                     subjects[name] = [];
                 }
                 subjects[name].push({
-                    context: this,
+                    context: context || this,
                     callback: callback
                 });
-                // console.log('subscribe', name);
             }
         });
 
@@ -234,9 +236,6 @@
             each(self.type, function (type) {
                 self.mediator.publish(type, results(self.props, event.target), self);
             });
-            // for (var i = 0, j = this.type.length; i < j; i++) {
-            //     this.mediator.publish(this.type[i], results(this.props, event.target), this);
-            // }
         }
 
     }));
@@ -254,8 +253,8 @@
     extend(Provider.prototype, extend(Events, {
 
         initialize: function () {
-            this.mediator.subscribe(this.evt.track, this.track);
-            this.mediator.subscribe(this.evt.pageview, this.pageview);
+            this.mediator.subscribe(this.evt.track, this.track, this);
+            this.mediator.subscribe(this.evt.pageview, this.pageview, this);
             this.setup.call(this);
         },
         setup: function () {},
@@ -267,38 +266,59 @@
     Provider.extend = inherits;
 
 
-    // ### Providers
+    // ### Providers Module
 
-    var GAQProvider = Provider.extend({
+    var Providers = (function () {
 
-        initialize: function (options) {
-            // super
-            Provider.prototype.initialize.apply(this, arguments);
+        var providers = {
+            gaq: {
+                name: 'GoogleAnalytics',
+                options: {
+                    account: 'UA-XXXXX-X'
+                },
+                methods: {
+                    setup: function () {
+                        var _gaq = root._gaq;
 
-            var _gaq = root._gaq;
+                        _gaq = _gaq || [];
+                        _gaq.push(['_setAccount', this.options.account]);
+                        _gaq.push(['_trackPageview']);
 
-            _gaq = _gaq || [];
-            _gaq.push(['_setAccount', 'UA-11']);
-            _gaq.push(['_trackPageview']);
+                        var ga = document.createElement('script');
+                        ga.type = 'text/javascript';
+                        ga.async = true;
+                        ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                        var s = document.getElementsByTagName('script')[0];
+                        s.parentNode.insertBefore(ga, s);
 
-            var ga = document.createElement('script');
-            ga.type = 'text/javascript';
-            ga.async = true;
-            ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(ga, s);
+                    },
+                    track: function (props, context) {
+                        console.log('gaq track ', flatten(props));
+                        root._gaq.push(['_trackEvent', flatten(props)]);
 
-        },
+                    },
+                    pageview: function (props) {
+                        var url = document.location.pathname;
+                        if (props && props.url) {
+                            url = props.url;
+                        }
+                        console.log('gaq pageview ', url);
+                        root._gaq.push(['_trackPageview', url]);
+                    }
+                }
+            }
+        };
 
-        track: function (props) {
-            console.log('gaq track ', props);
-        },
+        var get = function (name) {
+            if (!providers[name]) return false;
+            return providers[name];
+        };
 
-        pageview: function (props) {
-            console.log('gaq pageview ', props);
-        }
+        return {
+            get: get
+        };
 
-    });
+    }).call(root);
 
 
     // ## Capture   
@@ -324,22 +344,24 @@
                     each(oEvents, function (oEvent) {
                         self.events.push(self.addEvent(oEvent));
                     });
-                    // for (var i = 0, j = oEvents.length; i < j; i++) {
-                    //     self.events.push(self.addEvent(oEvents[i]));
-                    // }
                 }
                 if (oProviders && oProviders.length) {
                     each(oProviders, function (oProvider) {
                         self.providers.push(self.addProvider(oProvider));
                     });
-                    // for (var k = 0, l = oProviders.length; k < l; k++) {
-                    //     self.providers.push(self.addProvider(oProviders[k]));
-                    // }
+                } else {
+                    // THROW ERROR
                 }
             }
         },
 
-        addProvider: function (provider) {
+        // TODO Make sure you can't add duplicate providers.
+        // NOTE Would you ever need to track to different accounts?
+        addProvider: function (obj) {
+            var provider = Providers.get(obj.name);
+            if (provider) {
+                provider = extend(provider, obj);
+            }
             var Surrogate = Provider.extend(provider.methods);
             return new Surrogate(provider.options);
         },
@@ -352,7 +374,7 @@
             return new CaptureEvent(capture_event);
         },
 
-        // TODO: make sure to remove events when removing
+        // TODO: make sure to remove events from Events mediator when removing
         removeEvent: function (cid) {},
 
         track: function (props) {

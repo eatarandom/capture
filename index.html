@@ -19,7 +19,7 @@
 			padding:0;
 		}
 		ul, li {
-			padding:5px;
+			padding:5px 0;
 		}
 		a {
 			text-decoration: none;
@@ -27,20 +27,25 @@
 		a:hover {
 			text-decoration:underline;
 		}
+		.wrapper {
+			padding: 0 0 0 10px;
+		}
 	</style>
 </head>
 <body>
- 	<h1> 
- 		Capture Dom Examples
- 	</h1>
- 	<ul>
-		<li><a class="test-link a" href="/test-link-a">Hover to trigger a track event</a></li>
- 		<li><a class="test-link b" href="/test-link-b">Click to trigger a pageview</a></li>
-		<li><a class="test-link c" href="/test-link-c">Click to trigger a track event &amp; a pageview</a></li>
- 		<li><a class="test-link d" href="/test-link-d">Click to trigger a track event from javascript</a></li>
- 	</ul>
-	
-	
+ 	<div class="wrapper">
+ 		<h1> 
+	 		Capture
+	 		<img src="https://travis-ci.org/eatarandom/capture.png?branch=master" />
+	 	</h1>
+	 	<ul>
+			<li><a class="test-link a" href="/test-link-a">Hover to trigger a track event</a></li>
+	 		<li><a class="test-link b" href="/test-link-b">Click to trigger a pageview</a></li>
+			<li><a class="test-link c" href="/test-link-c">Click to trigger a track event &amp; a pageview</a></li>
+	 		<li><a class="test-link d" href="/test-link-d">Click to trigger a track event from javascript</a></li>
+	 	</ul>	
+ 	</div>
+ 	
  	<script src="components/underscore/underscore-min.js"></script>
  	<script src="components/zepto/zepto.min.js"></script> 	
  	<script src="src/capture.js"></script>
@@ -103,35 +108,18 @@
  			events: eventsData,
  			//providers
  			providers: [{
- 				name: 'GoogleAnalytics',
+ 				name: 'gaq',
  				options: {
- 					account: 'UA-001'
- 				},
- 				methods: {
- 					 setup: function () {
-			            var _gaq = this._gaq;
-
-			            _gaq = _gaq || [];
-			            _gaq.push(['_setAccount', this.options.account]);
-			            _gaq.push(['_trackPageview']);
-
-			            var ga = document.createElement('script');
-			            ga.type = 'text/javascript';
-			            ga.async = true;
-			            ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			            var s = document.getElementsByTagName('script')[0];
-			            s.parentNode.insertBefore(ga, s);
-
-			        },
-			        track: function (props) {
-			            console.log('gaq track ', props);
-			        },
-			        pageview: function (props) {
-			            console.log('gaq pageview ', props);
-			        }	
+ 					account: 'UA-01'
  				}
  			}]
  		});
+ 		// capture.addProvider({
+ 		// 	name: 'gaq',
+ 		// 	options: {
+ 		// 		account: 'UA-XXXX'
+ 		// 	}
+ 		// });
 
 
 		
