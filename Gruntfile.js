@@ -91,7 +91,7 @@ module.exports = function (grunt) {
 				options: {
 					'banner': '/*!\n' + ' * <%= config.name %> <%= config.version %>\n' + ' * (c) <%= config.year %> <%= config.author %>\n' + ' * Capture may be freely distributed under the <%= config.license %> license.\n' + ' * For all details and documentation:\n' + ' * <%= config.homepage %>\n' + ' */\n'
 				},
-				
+
 				files: {
 					'capture.min.js': ['capture.js']
 				}
