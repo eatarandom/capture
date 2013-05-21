@@ -1,4 +1,4 @@
-// Capture 0.1.0-beta
+// Capture 0.1.1-beta
 //  
 // (c)  Dan Roberts, Ogilvy & Mather Atlanta
 // Capture may be freely distributed under the MIT license.
@@ -17,7 +17,7 @@
     var $ = root.Zepto || root.jQuery || root.$;
 
     // Current capture version.
-    var VERSION = '0.1.0-beta';
+    var VERSION = '0.1.1-beta';
 
     // Default properties.
     // TODO Make this stuff work.
@@ -216,13 +216,14 @@
         initialize: function () {
             var self = this;
 
-            this.selector = $(this.selector);
             if (!this.selector || !this.selector.length) {
                 throw new Error('CaptureEvent' + this.id + 'needs a valid selector');
             }
             if (typeof this.type === 'string') {
                 this.type = this.type.split();
             }
+            this.selector = $(this.selector);
+            // add console.warn incase this selector can't be found in the document?
             this.selector.on(this.action, function (event) {
                 self.publish(event);
             });
@@ -230,8 +231,6 @@
 
         publish: function (event) {
             var self = this;
-            // remove in production
-            event.preventDefault();
 
             each(self.type, function (type) {
                 self.mediator.publish(type, results(self.props, event.target), self);
@@ -293,7 +292,7 @@
 
                     },
                     track: function (props, context) {
-                        console.log('gaq track ', flatten(props));
+                        //console.log('gaq track ', flatten(props));
                         root._gaq.push(['_trackEvent', flatten(props)]);
 
                     },
@@ -302,7 +301,7 @@
                         if (props && props.url) {
                             url = props.url;
                         }
-                        console.log('gaq pageview ', url);
+                        //console.log('gaq pageview ', url);
                         root._gaq.push(['_trackPageview', url]);
                     }
                 }
