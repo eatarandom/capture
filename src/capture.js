@@ -277,11 +277,10 @@
                 },
                 methods: {
                     setup: function () {
-                        var _gaq = root._gaq;
+                        root._gaq = root._gaq || [];
 
-                        _gaq = _gaq || [];
-                        _gaq.push(['_setAccount', this.options.account]);
-                        _gaq.push(['_trackPageview']);
+                        root._gaq.push(['_setAccount', this.options.account]);
+                        root._gaq.push(['_trackPageview']);
 
                         var ga = document.createElement('script');
                         ga.type = 'text/javascript';
