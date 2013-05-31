@@ -28,7 +28,8 @@
 
     // CaptureEvent default properties. 
     var captureEventDefaults = {
-        selector: 'body',
+        parent_selector: 'body',
+        selector: 'div',
         action: 'click',
         type: 'track',
         props: {}
@@ -215,16 +216,18 @@
 
         initialize: function () {
             var self = this;
-
+            if (!this.parent_selector || !this.parent_selector.length) {
+                throw new Error('CaptureEvent #' + this.id + ' needs a valid parent_selector');
+            }
             if (!this.selector || !this.selector.length) {
-                throw new Error('CaptureEvent' + this.id + 'needs a valid selector');
+                throw new Error('CaptureEvent #' + this.id + ' needs a valid selector');
             }
             if (typeof this.type === 'string') {
                 this.type = this.type.split();
             }
-            this.selector = $(this.selector);
+            this.parent_selector = $(this.parent_selector);
             // add console.warn incase this selector can't be found in the document?
-            this.selector.on(this.action, function (event) {
+            this.parent_selector.on(this.action, this.selector, function (event) {
                 self.publish(event);
             });
         },
@@ -291,7 +294,7 @@
 
                     },
                     track: function (props, context) {
-                        //console.log('gaq track ', flatten(props));
+                        console.log('gaq track ', flatten(props));
                         root._gaq.push(['_trackEvent', flatten(props)]);
 
                     },
@@ -300,7 +303,7 @@
                         if (props && props.url) {
                             url = props.url;
                         }
-                        //console.log('gaq pageview ', url);
+                        console.log('gaq pageview ', url);
                         root._gaq.push(['_trackPageview', url]);
                     }
                 }
