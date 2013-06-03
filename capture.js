@@ -1,4 +1,4 @@
-// Capture 0.1.3
+// Capture 0.1.4
 //  
 // (c)  Dan Roberts, Ogilvy & Mather Atlanta
 // Capture may be freely distributed under the MIT license.
@@ -17,7 +17,7 @@
     var $ = root.Zepto || root.jQuery || root.$;
 
     // Current capture version.
-    var VERSION = '0.1.3';
+    var VERSION = '0.1.4';
 
     // Default properties.
     // TODO Make this stuff work.
@@ -25,16 +25,6 @@
         debug: false,
         delay: false
     };
-
-    // CaptureEvent default properties. 
-    var captureEventDefaults = {
-        parent_selector: 'body',
-        selector: 'div',
-        action: 'click',
-        type: 'track',
-        props: {}
-    };
-
 
     // ## Internal Helper Methods
 
@@ -207,6 +197,13 @@
 
     function CaptureEvent(options) {
         this.cid = uniqueId('ce');
+        this.defaults = {
+            parent_selector: 'html',
+            selector: 'div',
+            action: 'click',
+            type: 'track',
+            props: {}
+        };
         extend(this, extend(captureEventDefaults, options));
         if (this.id < 0) this.id = this.cid;
         this.initialize.call(this);

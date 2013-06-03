@@ -26,16 +26,6 @@
         delay: false
     };
 
-    // CaptureEvent default properties. 
-    var captureEventDefaults = {
-        parent_selector: 'body',
-        selector: 'div',
-        action: 'click',
-        type: 'track',
-        props: {}
-    };
-
-
     // ## Internal Helper Methods
 
     // #### Log
@@ -207,6 +197,13 @@
 
     function CaptureEvent(options) {
         this.cid = uniqueId('ce');
+        this.defaults = {
+            parent_selector: 'html',
+            selector: 'div',
+            action: 'click',
+            type: 'track',
+            props: {}
+        };
         extend(this, extend(captureEventDefaults, options));
         if (this.id < 0) this.id = this.cid;
         this.initialize.call(this);
