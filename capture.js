@@ -124,6 +124,8 @@
             var key = kys[i];
             if (typeof props[key] === 'function') {
                 obj[key] = props[key].call(context, opts);
+            } else {
+                obj[key] = props[key];
             }
         }
         return obj;
