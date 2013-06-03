@@ -34,13 +34,13 @@
     // Credit to __Paul Irish__.
     // Reference: [Log. A lightweight wrapper for console.log](http://paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/)
     var log = function () {
-        if (this.debug) {
-            log.history = log.history || []; // store logs to an array for reference
-            log.history.push(arguments);
-            if (root.console) {
-                console.log(Array.prototype.slice.call(arguments));
-            }
+        //if (this.debug) {
+        log.history = log.history || []; // store logs to an array for reference
+        log.history.push(arguments);
+        if (root.console) {
+            console.log(Array.prototype.slice.call(arguments));
         }
+        //}
     };
 
     // __Extend__ an object with some new properties.
@@ -294,7 +294,7 @@
 
                     },
                     track: function (props, context) {
-                        //console.log('gaq track ', flatten(props));
+                        log('gaq track ', flatten(props));
                         root._gaq.push(['_trackEvent', flatten(props)]);
 
                     },
@@ -303,7 +303,7 @@
                         if (props && props.url) {
                             url = props.url;
                         }
-                        //console.log('gaq pageview ', url);
+                        log('gaq pageview ', url);
                         root._gaq.push(['_trackPageview', url]);
                     }
                 }
