@@ -1,4 +1,4 @@
-// Capture 0.1.4
+// Capture 0.1.5
 //  
 // (c)  Dan Roberts, Ogilvy & Mather Atlanta
 // Capture may be freely distributed under the MIT license.
@@ -17,7 +17,7 @@
     var $ = root.Zepto || root.jQuery || root.$;
 
     // Current capture version.
-    var VERSION = '0.1.4';
+    var VERSION = '0.1.5';
 
     // Default properties.
     // TODO Make this stuff work.
@@ -116,13 +116,14 @@
     // If the value of the key is a function, the 
     // function is called with the provided context or root.
     // Otherwise, keep the key/value the same.
-    var results = function (obj, context) {
+    var results = function (props, context, opts) {
         var ctx = context || root; // leak of scope here, fix
-        var kys = keys(obj);
+        var kys = keys(props);
+        var obj = {};
         for (var i = 0, j = kys.length; i < j; i++) {
             var key = kys[i];
-            if (typeof obj[key] === 'function') {
-                obj[key] = obj[key].call(context);
+            if (typeof props[key] === 'function') {
+                obj[key] = props[key].call(context, opts);
             }
         }
         return obj;
@@ -204,7 +205,7 @@
             type: 'track',
             props: {}
         };
-        extend(this, extend(captureEventDefaults, options));
+        extend(this, extend(this.defaults, options));
         if (this.id < 0) this.id = this.cid;
         this.initialize.call(this);
     }
@@ -224,16 +225,16 @@
             }
             this.parent_selector = $(this.parent_selector);
             // add console.warn incase this selector can't be found in the document?
-            this.parent_selector.on(this.action, this.selector, function (event) {
-                self.publish(event);
+            this.parent_selector.on(this.action, this.selector, function (event, opts) {
+                self.publish(event, opts);
             });
         },
 
-        publish: function (event) {
+        publish: function (event, opts) {
             var self = this;
 
             each(self.type, function (type) {
-                self.mediator.publish(type, results(self.props, event.target), self);
+                self.mediator.publish(type, results(self.props, event.target, opts), self);
             });
         }
 
@@ -291,7 +292,7 @@
 
                     },
                     track: function (props, context) {
-                        console.log('gaq track ', flatten(props));
+                        //console.log('gaq track ', flatten(props));
                         root._gaq.push(['_trackEvent', flatten(props)]);
 
                     },
@@ -300,7 +301,7 @@
                         if (props && props.url) {
                             url = props.url;
                         }
-                        console.log('gaq pageview ', url);
+                        //console.log('gaq pageview ', url);
                         root._gaq.push(['_trackPageview', url]);
                     }
                 }
