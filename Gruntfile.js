@@ -76,8 +76,8 @@ module.exports = function (grunt) {
 					flatten: true
 				},
 				files: [{
-					src: ['src/capture.js'],
-					dest: 'capture.js'
+						src: ['src/capture.js'],
+						dest: 'capture.js'
 				}]
 			}
 		},
