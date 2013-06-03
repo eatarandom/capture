@@ -1,4 +1,4 @@
-// Capture 0.1.5
+// Capture 0.1.6
 //  
 // (c)  Dan Roberts, Ogilvy & Mather Atlanta
 // Capture may be freely distributed under the MIT license.
@@ -17,7 +17,7 @@
     var $ = root.Zepto || root.jQuery || root.$;
 
     // Current capture version.
-    var VERSION = '0.1.5';
+    var VERSION = '0.1.6';
 
     // Default properties.
     // TODO Make this stuff work.

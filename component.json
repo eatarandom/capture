@@ -1,6 +1,6 @@
 {
 	"name": "capture",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"devDependencies": {
 		"underscore": "~1.4.4",
 		"zepto": "~1.0.0rc1"
