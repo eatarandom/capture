@@ -1,4 +1,4 @@
-// Capture 0.2.0
+// Capture 0.2.1
 //  
 // (c)  Dan Roberts
 // Capture may be freely distributed under the MIT license.
@@ -17,7 +17,7 @@
     var $ = root.Zepto || root.jQuery || root.$;
 
     // Current capture version.
-    var VERSION = '0.2.0';
+    var VERSION = '0.2.1';
 
 
     // ## Internal Helper Methods
