@@ -1,6 +1,6 @@
-// Capture 0.1.6
+// Capture 0.2.0
 //  
-// (c)  Dan Roberts, Ogilvy & Mather Atlanta
+// (c)  Dan Roberts
 // Capture may be freely distributed under the MIT license.
 // For all details and documentation:
 // [http://eatarandom.github.com/capture/](http://eatarandom.github.com/capture/)
@@ -17,30 +17,20 @@
     var $ = root.Zepto || root.jQuery || root.$;
 
     // Current capture version.
-    var VERSION = '0.1.6';
+    var VERSION = '0.2.0';
 
-    // Default properties.
-    // TODO Make this stuff work.
-    var defaults = {
-        debug: false,
-        delay: false
-    };
 
     // ## Internal Helper Methods
 
+
     // #### Log
     // A safe way to console log.
-
-    // Credit to __Paul Irish__.
-    // Reference: [Log. A lightweight wrapper for console.log](http://paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/)
     var log = function () {
-        //if (this.debug) {
         log.history = log.history || []; // store logs to an array for reference
         log.history.push(arguments);
         if (root.console) {
-            console.log(Array.prototype.slice.call(arguments));
+            console.log('Capture', Array.prototype.slice.call(arguments));
         }
-        //}
     };
 
     // __Extend__ an object with some new properties.
@@ -53,32 +43,7 @@
         return a;
     };
 
-    // __Inherit__ from a super class.
-    var inherits = function (props) {
-        var parent = this,
-            child = function () {
-                return parent.apply(this, arguments);
-            };
-
-        extend(child, parent);
-
-        var Surrogate = function () {
-            this.constructor = child;
-        };
-        Surrogate.prototype = parent.prototype;
-        child.prototype = new Surrogate();
-
-        if (props) extend(child.prototype, props);
-
-        child.__super__ = parent.prototype;
-
-        return child;
-    };
-
     // Create and return a __uniqueId__.
-
-    // Credit the authors of __Underscore.js__ 
-    // Reference `_.uniqueId()` from [Underscore.js](https://github.com/documentcloud/underscore)
     var idCounter = 0;
     var uniqueId = function (prefix) {
         var id = ++idCounter + '';
@@ -91,24 +56,14 @@
     // Credit the authors of __Underscore.js__ 
     // Reference `_.keys(obj)` [Underscore.js](https://github.com/documentcloud/underscore)
     var keys = Object.keys || function (obj) {
-            if (obj !== Object(obj)) {
-                throw new TypeError('Invalid object');
-            }
-            var keys = [];
-            for (var key in obj) {
-                keys[keys.length] = key;
-            }
-            return keys;
-        };
-
-
-    // #### Has
-    // Does an object have a key.
-
-    // Credit the authors of __Underscore.js__ 
-    // Reference `_.keys(obj)` [Underscore.js](https://github.com/documentcloud/underscore)
-    var has = function (obj, key) {
-        return Object.prototype.hasOwnProperty.call(obj, key);
+        if (obj !== Object(obj)) {
+            throw new TypeError('Invalid object');
+        }
+        var keys = [];
+        for (var key in obj) {
+            keys[keys.length] = key;
+        }
+        return keys;
     };
 
     // #### Results
@@ -116,14 +71,14 @@
     // If the value of the key is a function, the 
     // function is called with the provided context or root.
     // Otherwise, keep the key/value the same.
-    var results = function (props, context, opts) {
+    var results = function (props, context) {
         var ctx = context || root; // leak of scope here, fix
         var kys = keys(props);
         var obj = {};
         for (var i = 0, j = kys.length; i < j; i++) {
             var key = kys[i];
             if (typeof props[key] === 'function') {
-                obj[key] = props[key].call(context, opts);
+                obj[key] = props[key].call(context);
             } else {
                 obj[key] = props[key];
             }
@@ -151,69 +106,42 @@
     };
 
 
-    // ## Internal Methods
-
-    // ### Events
-    // Events Mediator shared throughout Capture.
-
-    var Events = (function () {
-
-        function Mediator() {
-            this.subjects = {};
-        }
-
-        extend(Mediator.prototype, {
-            publish: function (name, props, context) {
-                var subjects = this.subjects;
-                if (subjects.hasOwnProperty(name)) {
-                    each(subjects[name], function (subject) {
-                        subject.callback.call(subject[context], props, context);
-                    });
-                }
-            },
-            subscribe: function (name, callback, context) {
-                var subjects = this.subjects;
-                if (!subjects.hasOwnProperty(name)) {
-                    subjects[name] = [];
-                }
-                subjects[name].push({
-                    context: context || this,
-                    callback: callback
-                });
-            }
-        });
-
-        return {
-            evt: {
-                track: 'track',
-                pageview: 'pageview'
-            },
-            mediator: new Mediator()
-        };
-
-    }).call(root);
-
-
-    // ### CaptureEvent
-    // Class for CaptureEvents. Assumed now to be events based on dom interaction. See todos.
-    // TODO distinguish events bewteen dom based or javascript based?
-
-    function CaptureEvent(options) {
-        this.cid = uniqueId('ce');
+    /**
+     *  CaptureEvent
+     *
+     *  capture             {Capture}
+     *  id                  {Number}
+     *  parent_selector     {String}{Object}
+     *  selector            {String}{Object}
+     *  action              {String}
+     *  type                {String}
+     *  delay               {Boolean}
+     *  prevent             {Boolean}
+     *  props               {Object}
+     *  initialize()        {Function}
+     *  message()           {Function}
+     */
+    function CaptureEvent(capture, options) {
+        this.cid = uniqueId('event');
+        this.capture = capture;
         this.defaults = {
+            id: '',
             parent_selector: 'html',
-            selector: 'div',
-            action: 'click',
-            type: 'track',
-            props: {}
+            selector: '',
+            action: '',
+            type: '',
+            delay: false,
+            prevent: false,
+            props: null
         };
         extend(this, extend(this.defaults, options));
-        if (this.id < 0) this.id = this.cid;
-        this.initialize.call(this);
+        this.initialize.apply(this, options);
+        if (capture.debug) {
+            log('Created Event', this.toString(), this);
+        }
     }
 
-    extend(CaptureEvent.prototype, extend(Events, {
-
+    extend(CaptureEvent.prototype, {
         initialize: function () {
             var self = this;
             if (!this.parent_selector || !this.parent_selector.length) {
@@ -222,174 +150,152 @@
             if (!this.selector || !this.selector.length) {
                 throw new Error('CaptureEvent #' + this.id + ' needs a valid selector');
             }
-            if (typeof this.type === 'string') {
-                this.type = this.type.split();
-            }
-            this.parent_selector = $(this.parent_selector);
-            // add console.warn incase this selector can't be found in the document?
-            this.parent_selector.on(this.action, this.selector, function (event, opts) {
-                self.publish(event, opts);
-            });
-        },
-
-        publish: function (event, opts) {
-            var self = this;
-
-            each(self.type, function (type) {
-                self.mediator.publish(type, results(self.props, event.target, opts), self);
-            });
-        }
-
-    }));
-
-
-    // ### Provider
-    // Class for Providers to extend.
-
-    function Provider(options) {
-        this.cid = uniqueId('provider');
-        this.options = options;
-        this.initialize.apply(this, arguments);
-    }
-
-    extend(Provider.prototype, extend(Events, {
-
-        initialize: function () {
-            this.mediator.subscribe(this.evt.track, this.track, this);
-            this.mediator.subscribe(this.evt.pageview, this.pageview, this);
-            this.setup.call(this);
-        },
-        setup: function () {},
-        track: function () {},
-        pageview: function () {}
-
-    }));
-
-    Provider.extend = inherits;
-
-
-    // ### Providers Module
-
-    var Providers = (function () {
-
-        var providers = {
-            gaq: {
-                name: 'GoogleAnalytics',
-                options: {
-                    account: 'UA-XXXXX-X'
-                },
-                methods: {
-                    setup: function () {
-                        root._gaq = root._gaq || [];
-
-                        root._gaq.push(['_setAccount', this.options.account]);
-                        root._gaq.push(['_trackPageview']);
-
-                        var ga = document.createElement('script');
-                        ga.type = 'text/javascript';
-                        ga.async = true;
-                        ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                        var s = document.getElementsByTagName('script')[0];
-                        s.parentNode.insertBefore(ga, s);
-
-                    },
-                    track: function (props, context) {
-                        log('gaq track ', flatten(props));
-                        root._gaq.push(['_trackEvent', flatten(props)]);
-
-                    },
-                    pageview: function (props) {
-                        var url = document.location.pathname;
-                        if (props && props.url) {
-                            url = props.url;
-                        }
-                        log('gaq pageview ', url);
-                        root._gaq.push(['_trackPageview', url]);
-                    }
+            $(this.parent_selector).on(self.action, self.selector, function (event) {
+                if (self.prevent) {
+                    event.preventDefault();
                 }
-            }
-        };
-
-        var get = function (name) {
-            if (!providers[name]) return false;
-            return providers[name];
-        };
-
-        return {
-            get: get
-        };
-
-    }).call(root);
-
-
-    // ## Capture   
-
+                self.message({
+                    type: self.type,
+                    props: self.props,
+                    context: event.target
+                });
+            });
+        },
+        // Send a message to Capture facade.
+        message: function (msg) {
+            this.capture.message(msg);
+        },
+        toString: function () {
+            return 'CaptureEvent' + ' ' + this.id;
+        }
+    });
+    /**
+     *  Capture Facade
+     *
+     *  version             {String}
+     *  providers           {Array}
+     *  config              {Array}
+     *  events              {Array}
+     *  initialize()        {Function}
+     *  log()               {Function}
+     *  message()           {Function}
+     */
     function Capture(options) {
         this.version = VERSION;
-        this.events = [];
-        this.providers = [];
-        extend(this, extend(defaults, options));
+        this.defaults = {
+            debug: false,
+            events: [],
+            config: null,
+            provider: null,
+            provider_config: null
+        };
+        extend(this, extend(this.defaults, options));
+        this.debug = this.debug || /[?&]capture=true/.test(location.href);
+        if (this.debug) {
+            log('Initialized');
+        }
+        this.initialize.apply(this, arguments);
+        if (this.debug) {
+            log('Loaded', this);
+        }
+    }
+
+    extend(Capture.prototype, {
+        initialize: function (options) {
+            var self = this;
+            // Loop over config of events.
+            if (self.debug) {
+                log('Looping over events', self.config);
+            }
+            each(self.config, function (data) {
+                // Create Event.
+                self.createEvent(data, function (captureEvent) {
+                    self.events[self.events.length] = captureEvent;
+                });
+            });
+            if (!options.provider) {
+                self.provider = new Provider({
+                    debug: self.debug,
+                    account: self.provider_config.account,
+                    namespace: self.provider_config.namespace,
+                    props: self.provider_config.props
+                });
+            }
+
+        },
+        createEvent: function (data, callback) {
+            if (callback && typeof callback === 'function') {
+                callback.call(this, new CaptureEvent(this, data));
+            }
+        },
+        message: function (options) {
+            var self = this;
+            self.provider.send(options, function () {
+                if (self.debug) {
+                    log('Success');
+                }
+            });
+        }
+    });
+
+
+
+    /**
+     *  Provider
+     *
+     *  account             {String}
+     *  initialize()        {Function}
+     *  load()              {Function}
+     *  send()              {Function}
+     */
+    function Provider(options) {
+        this.defaults = {
+            debug: false,
+            account: '',
+            namespace: 'ga',
+            props: null
+        };
+        extend(this, extend(this.defaults, options));
         this.initialize.apply(this, arguments);
     }
 
-    extend(Capture.prototype, extend(Events, {
-
-        initialize: function (options) {
-            var opts = options,
-                self = this,
-                oEvents = opts.events,
-                oProviders = opts.providers;
-
-            if (opts) {
-                if (oEvents && oEvents.length) {
-                    each(oEvents, function (oEvent) {
-                        self.events.push(self.addEvent(oEvent));
-                    });
-                }
-                if (oProviders && oProviders.length) {
-                    each(oProviders, function (oProvider) {
-                        self.providers.push(self.addProvider(oProvider));
-                    });
-                } else {
-                    // THROW ERROR
-                }
+    extend(Provider.prototype, {
+        initialize: function () {
+            this.load(this.account, this.props);
+        },
+        // Load Google Analytics Script.
+        load: function (account, props) {
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments);
+                },
+                i[r].l = 1 * new Date();
+                a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m);
+            })(window, document, 'script', 'http://www.google-analytics.com/analytics.js', this.namespace);
+            root[this.namespace]('create', account, props);
+            root[this.namespace]('send', 'pageview');
+        },
+        // Send data to Google Analytics
+        send: function (options, callback) {
+            var props = results(options.props, options.context);
+            if (this.debug) {
+                log('Sending', options.type, flatten(props).join(','));
             }
-        },
-
-        // TODO Make sure you can't add duplicate providers.
-        // NOTE Would you ever need to track to different accounts?
-        addProvider: function (obj) {
-            var provider = Providers.get(obj.name);
-            if (provider) {
-                provider = extend(provider, obj);
-            }
-            var Surrogate = Provider.extend(provider.methods);
-            return new Surrogate(provider.options);
-        },
-
-        removeProvider: function (cid) {},
-
-        // TODO distinguish bewten dom based event and javascript based event?
-        // TODO error check this so a new event isn't created unless it valid
-        addEvent: function (capture_event) {
-            return new CaptureEvent(capture_event);
-        },
-
-        // TODO: make sure to remove events from Events mediator when removing
-        removeEvent: function (cid) {},
-
-        track: function (props) {
-            this.mediator.publish('track', props, this);
-        },
-
-        pageview: function (props) {
-            this.mediator.publish('pageview', props, this);
+            props['hitCallback'] = callback;
+            root[this.namespace]('send', options.type, props);
         }
+    });
 
-    }));
 
 
     // ## Expose to the world
+
+
 
     // CommonJS
     var CommonJS = false;
@@ -411,5 +317,7 @@
     if (!CommonJS && !AMD) {
         root.Capture = Capture;
     }
+
+
 
 }).call(this);

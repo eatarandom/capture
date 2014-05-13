@@ -1,7 +1,7 @@
 {
   "name": "Capture",
-  "version": "0.1.6",
-  "description": "Javascript analytics made easy.",
+  "version": "0.2.0",
+  "description": "Google analytics made easy.",
   "scripts": {
     "test": "grunt"
   },
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git://github.com/eatarandom/capture.git"
   },
-  "author": "Dan Roberts, Ogilvy & Mather Atlanta",
+  "author": "Dan Roberts",
   "license": "MIT",
   "devDependencies": {
     "grunt": "*",

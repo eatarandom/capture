@@ -39,7 +39,7 @@
 	 		<img src="https://travis-ci.org/eatarandom/capture.png?branch=master" />
 	 	</h1>
 	 	<ul>
-			<li><a class="test-link a" href="/test-link-a">Hover to trigger a track event</a></li>
+			<li class="parent_guy"><a class="test-link a" href="/test-link-a">Hover to trigger a track event</a></li>
 	 		<li><a class="test-link b" href="/test-link-b">Click to trigger a pageview</a></li>
 			<li><a class="test-link c" href="/test-link-c">Click to trigger a track event &amp; a pageview</a></li>
 	 		<li><a class="test-link d" href="/test-link-d">Click to trigger a track event from javascript</a></li>
@@ -47,7 +47,6 @@
 	 	<a class="test-link" href="/test-link-e">Another test case, shouldn't do anything</a>	
  	</div>
  	
- 	<script src="components/underscore/underscore-min.js"></script>
  	<script src="components/zepto/zepto.min.js"></script> 	
  	<script src="src/capture.js"></script>
 	
@@ -59,12 +58,14 @@
 
  		var eventsData = [{
 			'id': '100',
+			'parent_selector': 'html',
 			'selector': '.test-link.a',
 			'action': 'mouseover',
 			'type': 'track',
 			'props': {
 		    	category: 'category',
 		    	action: function() {
+		    		console.log(this);
 			    	return $(this).attr('href');
 			    },
 			    opt_label: 'opt_label',
@@ -76,6 +77,7 @@
 			'selector': '.test-link.b',
 			'action': 'click',
 			'type': 'pageview',
+			'prevent': true,
 			'props': {
 		    	category: 'category',
 		    	action: 'action',
@@ -83,56 +85,18 @@
 			    opt_value: 1,
 			    opt_noninteraction: true
 			}
-		}, {
-			'id': '209',
-			'selector': '.test-link.c',
-			'action': 'click',
-			'type': ['track', 'pageview'],
-			'props': {
-		    	category: 'category',
-		    	action: 'action',
-			    opt_label: 'opt_label',
-			    opt_value: 0,
-			    opt_noninteraction: false
-			}
-		}, {
-			'id': '300',
-			'parent_selector': 'li',
-			'selector': 'a',
-			'action': 'mouseover',
-			'type': ['track'],
-			'props': {
-		    	category: 'category',
-		    	action: 'action',
-			    opt_label: 'opt_label',
-			    opt_value: 0,
-			    opt_noninteraction: false
-			}
 		}];
 
+
  		var capture = new Capture({
- 			// debug mode ?
- 			debug: true,
- 			// delay
- 			delay: true,
- 			// events 
- 			events: eventsData,
- 			//providers
- 			providers: [{
- 				name: 'gaq',
- 				options: {
- 					account: 'UA-01'
- 				}
- 			}]
+ 			config: eventsData, 		// json config
+ 			provider_config: {
+ 				account:'UA-000-1',
+ 				namespace: 'ihg',
+ 				props: {}
+ 			},
+			debug: false 				// boolean to log out
  		});
- 		// capture.addProvider({
- 		// 	name: 'gaq',
- 		// 	options: {
- 		// 		account: 'UA-XXXX'
- 		// 	}
- 		// });
-
-
 		
 
  		$('.test-link').on('click', '.d', function(e) {
