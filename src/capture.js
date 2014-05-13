@@ -276,7 +276,7 @@
                 a.async = 1;
                 a.src = g;
                 m.parentNode.insertBefore(a, m);
-            })(window, document, 'script', 'http://www.google-analytics.com/analytics.js', this.namespace);
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', this.namespace);
             root[this.namespace]('create', account, props);
             root[this.namespace]('send', 'pageview');
         },
