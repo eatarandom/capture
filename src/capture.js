@@ -157,7 +157,7 @@
                 self.message({
                     type: self.type,
                     props: self.props,
-                    context: event.target
+                    context: this
                 });
             });
         },
