@@ -1,6 +1,6 @@
 {
 	"name": "capture",
-	"version": "0.2.5",
+	"version": "0.2.6",
 	"devDependencies": {
 		"zepto": "~1.0.0rc1"
 	}
