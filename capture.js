@@ -1,4 +1,4 @@
-// Capture 0.2.3
+// Capture 0.2.5
 //  
 // (c)  Dan Roberts
 // Capture may be freely distributed under the MIT license.
@@ -17,7 +17,7 @@
     var $ = root.Zepto || root.jQuery || root.$;
 
     // Current capture version.
-    var VERSION = '0.2.3';
+    var VERSION = '0.2.5';
 
 
     // ## Internal Helper Methods
@@ -135,14 +135,14 @@
             props: null
         };
         extend(this, extend(this.defaults, options));
-        this.initialize.apply(this, options);
+        this.initialize.call(this, options);
         if (capture.debug) {
             log('Created Event', this.toString(), this);
         }
     }
 
     extend(CaptureEvent.prototype, {
-        initialize: function () {
+        initialize: function (options) {
             var self = this;
             if (!this.parent_selector || !this.parent_selector.length) {
                 throw new Error('CaptureEvent #' + this.id + ' needs a valid parent_selector');
